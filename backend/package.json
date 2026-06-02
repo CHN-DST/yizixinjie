@@ -1,0 +1,25 @@
+{
+  "name": "yizixinjie-backend",
+  "version": "1.0.0",
+  "description": "一字心解 - 后端 API 服务",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "chinese-character",
+    "etymology",
+    "ai-vision"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "tesseract.js": "^7.0.0"
+  }
+}

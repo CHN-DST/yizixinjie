@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env.local
+.env.production
+
+# Build
+dist/
+build/
+
+# Uploads
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Reference PDFs (too large for Git)
+参考文献/*.pdf
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

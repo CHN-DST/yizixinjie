@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: yizixinjie-api
+    rootDirectory: backend
+    runtime: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: "3000"
+      - key: DEEPSEEK_API_URL
+        value: https://api.deepseek.com/v1/chat/completions
+      - key: CORS_ORIGIN
+        sync: false
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: MAX_FILE_SIZE
+        value: "10"
