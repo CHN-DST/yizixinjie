@@ -1,90 +1,79 @@
 @import './variables.css';
 
 /* ========= 全局重置 ========= */
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html {
-  font-size: 16px;
-  -webkit-text-size-adjust: 100%;
-}
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 
 body {
   font-family: var(--font-family);
   font-size: var(--font-size-md);
   color: var(--text-primary);
-  background-color: var(--bg-primary);
-  line-height: 1.6;
+  background-color: #f0e8d5;
+  background-image: linear-gradient(rgba(240, 228, 213, 0.5), rgba(240, 228, 213, 0.5)), url('/bg.jpg');
+  background-size: auto 100%;
+  background-position: 0 center;
+  background-repeat: repeat-x;
+  background-attachment: fixed;
+  animation: bgScroll 180s linear infinite;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: var(--color-primary);
-  text-decoration: none;
+@keyframes bgScroll {
+  from { background-position: 0 center; }
+  to   { background-position: -100% center; }
 }
 
-img {
-  max-width: 100%;
-  height: auto;
-}
-
-button {
-  border: none;
-  outline: none;
-  cursor: pointer;
-  font-family: inherit;
-}
+a { color: var(--color-primary); text-decoration: none; transition: color var(--transition-fast); }
+a:hover { color: var(--color-primary-dark); }
+img { max-width: 100%; height: auto; }
+button { border: none; outline: none; cursor: pointer; font-family: inherit; }
 
 /* ========= 通用容器 ========= */
-.page-container {
-  min-height: 100vh;
-  padding-bottom: var(--spacing-xl);
-}
+.page-container { min-height: 100vh; padding-bottom: var(--spacing-xl); }
+.content-container { padding: var(--spacing-md); max-width: 600px; margin: 0 auto; }
 
-.content-container {
-  padding: var(--spacing-md);
-  max-width: 600px;
-  margin: 0 auto;
-}
+/* ========= 工具类 ========= */
+.text-center { text-align: center; }
+.text-secondary { color: var(--text-secondary); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
 
-/* ========= 通用工具类 ========= */
-.text-center {
-  text-align: center;
-}
-
-.text-secondary {
-  color: var(--text-secondary);
-}
-
-.mt-sm {
-  margin-top: var(--spacing-sm);
-}
-.mt-md {
-  margin-top: var(--spacing-md);
-}
-.mt-lg {
-  margin-top: var(--spacing-lg);
-}
-.mb-md {
-  margin-bottom: var(--spacing-md);
-}
-.mb-lg {
-  margin-bottom: var(--spacing-lg);
-}
-
-/* ========= 通用卡片 ========= */
+/* ========= 古风卡片 ========= */
 .card {
   background: var(--bg-card);
+  border: 1px solid var(--border-color);
   border-radius: var(--border-radius);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   padding: var(--spacing-md);
   margin-bottom: var(--spacing-md);
+  transition: box-shadow var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* 宣纸横纹 */
+.card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 27px,
+    rgba(139, 115, 85, 0.025) 27px,
+    rgba(139, 115, 85, 0.025) 28px
+  );
+  pointer-events: none;
+  border-radius: inherit;
 }
 
 .card-title {
@@ -92,17 +81,128 @@ button {
   font-weight: 600;
   color: var(--text-title);
   margin-bottom: var(--spacing-xs);
+  font-family: var(--font-kai);
+  letter-spacing: 1px;
 }
 
 .card-text {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
-  line-height: 1.8;
+  line-height: 1.75;
 }
 
-/* ========= 安全区域适配 ========= */
+/* ========= 古风按钮 ========= */
+.van-button--primary {
+  background: linear-gradient(180deg, #A0523D 0%, #8B3A2A 50%, #6B2414 100%) !important;
+  border: 1px solid #5C1F14 !important;
+  color: #FDF8F0 !important;
+  font-family: var(--font-kai) !important;
+  letter-spacing: 3px !important;
+  font-size: var(--font-size-md) !important;
+  box-shadow: 0 2px 8px rgba(107, 36, 20, 0.35), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.van-button--primary:active {
+  transform: scale(0.97);
+  box-shadow: 0 1px 4px rgba(107, 36, 20, 0.4) !important;
+  background: linear-gradient(180deg, #8B3A2A 0%, #6B2414 100%) !important;
+}
+
+.van-button--default {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color-dark) !important;
+  color: var(--text-primary) !important;
+  font-family: var(--font-kai) !important;
+  letter-spacing: 2px !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.van-button--default:hover {
+  background: var(--bg-card-hover) !important;
+  border-color: var(--color-primary) !important;
+}
+
+.van-button--plain {
+  border: 1px dashed var(--border-color-dark) !important;
+  color: var(--color-primary) !important;
+  background: rgba(253, 250, 244, 0.6) !important;
+  font-family: var(--font-kai) !important;
+  letter-spacing: 1px !important;
+}
+
+/* ========= 古风输入框 ========= */
+.van-field__control {
+  color: var(--text-primary) !important;
+  font-size: var(--font-size-md) !important;
+}
+
+.van-field {
+  background: rgba(253, 250, 244, 0.75) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: var(--border-radius) !important;
+  transition: all var(--transition-fast) !important;
+}
+
+.van-field:focus-within {
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 0 0 3px rgba(139, 58, 42, 0.08) !important;
+}
+
+/* ========= 古风标签 ========= */
+.van-tag--primary {
+  background: var(--color-primary) !important;
+  color: var(--text-white) !important;
+  font-family: var(--font-kai) !important;
+}
+
+.van-tag--warning {
+  background: var(--color-gold) !important;
+  color: #2C1810 !important;
+}
+
+/* ========= 古风导航 ========= */
+.van-nav-bar {
+  background: linear-gradient(180deg, rgba(253, 250, 244, 0.96), rgba(245, 238, 220, 0.9)) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  backdrop-filter: blur(8px);
+}
+
+.van-nav-bar__title {
+  font-family: var(--font-kai) !important;
+  color: var(--text-title) !important;
+  font-size: var(--font-size-lg) !important;
+  letter-spacing: 2px;
+}
+
+/* ========= 古风对话框 ========= */
+.van-dialog {
+  border: 2px solid var(--border-color-dark) !important;
+  border-radius: var(--border-radius) !important;
+  background: var(--bg-card) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.van-dialog__header {
+  font-family: var(--font-kai) !important;
+  color: var(--text-title) !important;
+  font-size: var(--font-size-lg) !important;
+}
+
+/* ========= 古风 Toast ========= */
+.van-toast {
+  background: rgba(44, 24, 16, 0.9) !important;
+  border: 1px solid var(--border-color-dark) !important;
+  font-family: var(--font-kai) !important;
+  border-radius: var(--border-radius) !important;
+}
+
+/* ========= 滚动条美化 ========= */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-color-dark); border-radius: 3px; }
+
+/* ========= 安全区域 ========= */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
-  .page-container {
-    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom));
-  }
+  .page-container { padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom)); }
 }

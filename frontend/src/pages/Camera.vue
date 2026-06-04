@@ -2,7 +2,7 @@
   <div class="page-container camera-page">
     <!-- 顶部导航 -->
     <van-nav-bar
-      title="开始分析"
+      title="一字心解"
       left-text="返回"
       left-arrow
       @click-left="$router.back()"
@@ -10,89 +10,41 @@
       placeholder
     >
       <template #right>
-        <van-icon name="home-o" size="20" @click="$router.push('/')" style="margin-right: 16px;" />
+        <span class="remaining-badge" @click="showKeyDialog = true">剩余：{{ remainingCount }}次</span>
+        <van-icon name="home-o" size="20" @click="$router.push('/')" style="margin-left: 12px; margin-right: 12px;" />
         <van-icon name="clock-o" size="20" @click="$router.push('/history')" />
       </template>
     </van-nav-bar>
 
     <div class="content-container">
-      <!-- 输入模式切换 -->
-      <van-tabs v-model:active="activeTab" @change="onTabChange" sticky>
-        <van-tab title="📷 拍照上传" name="camera" />
-        <van-tab title="✏️ 直接输入" name="text" />
-      </van-tabs>
-
-      <!-- ==================== 拍照上传模式 ==================== -->
-      <div v-show="activeTab === 'camera'" class="tab-content">
-        <div class="camera-preview" @click="showActionSheet = true">
-          <div v-if="imagePreview" class="preview-image-container">
-            <img :src="imagePreview" alt="预览" class="preview-image" />
-            <van-icon name="replay" class="retake-btn" @click.stop="retake" />
-          </div>
-          <div v-else class="preview-placeholder">
-            <van-icon name="photograph" size="48" color="#bdc3c7" />
-            <p>点击此处拍照或选择图片</p>
-          </div>
-        </div>
-
-        <div class="camera-tips" v-if="!imagePreview">
-          <div class="tip-item">
-            <van-icon name="checked" color="#52c41a" />
-            <span>在白色或浅色纸上书写</span>
-          </div>
-          <div class="tip-item">
-            <van-icon name="checked" color="#52c41a" />
-            <span>光线充足，字迹清晰</span>
-          </div>
-          <div class="tip-item">
-            <van-icon name="checked" color="#52c41a" />
-            <span>汉字居中，避免倾斜</span>
-          </div>
-        </div>
-
+      <!-- 汉字输入区 -->
+      <div class="char-input-area">
         <input
-          ref="fileInputRef"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          class="file-input"
-          @change="onFileSelected"
+          ref="charInputRef"
+          v-model="typedChar"
+          type="text"
+          class="char-input"
+          maxlength="1"
+          placeholder="在此写一个汉字"
+          @input="onCharInput"
         />
-      </div>
-
-      <!-- ==================== 直接输入模式 ==================== -->
-      <div v-show="activeTab === 'text'" class="tab-content">
-        <div class="char-input-area">
-          <input
-            ref="charInputRef"
-            v-model="typedChar"
-            type="text"
-            class="char-input"
-            maxlength="1"
-            placeholder="在此写一个汉字"
-            @input="onCharInput"
-            @focus="charError = ''"
-          />
-          <div v-if="charError" class="char-error">
-            <van-icon name="warning-o" />
-            {{ charError }}
-          </div>
-          <div v-else-if="typedChar && !charError" class="char-valid">
-            <van-icon name="success" color="#52c41a" />
-            有效的汉字
-          </div>
+        <div v-if="charError" class="char-error">
+          <van-icon name="warning-o" />
+          {{ charError }}
         </div>
-
-        <div class="char-tips">
-          <van-icon name="info-o" />
-          <span>输入一个你想了解的汉字，如：心、爱、道、家……</span>
+        <div v-else-if="typedChar && !charError" class="char-valid">
+          <van-icon name="success" color="#52c41a" />
+          有效的汉字
         </div>
       </div>
 
-      <!-- ==================== 共用：用户问题区 ==================== -->
-      <div
-        v-show="hasContent"
-        class="question-section"
-      >
+      <div class="char-tips">
+        <van-icon name="info-o" />
+        <span>输入一个你想了解的汉字，如：心、爱、道、家……</span>
+      </div>
+
+      <!-- 用户问题区 -->
+      <div class="question-section">
         <div class="section-label">💬 你想问什么？（选填）</div>
         <van-field
           v-model="question"
@@ -101,13 +53,13 @@
           autosize
           maxlength="200"
           show-word-limit
-          placeholder='例如：我什么时候才能找到一份好工作？&#10;或者留空，让 AI 自由解读……'
+          placeholder="例如：我什么时候才能找到一份好工作？&#10;或者留空，让 AI 自由解读……"
           class="question-field"
         />
       </div>
 
-      <!-- ==================== 提交按钮 ==================== -->
-      <div v-show="hasContent" class="submit-section">
+      <!-- 提交按钮 -->
+      <div class="submit-section">
         <van-button
           type="primary"
           size="large"
@@ -115,6 +67,7 @@
           block
           :loading="isAnalyzing"
           loading-text="AI正在分析..."
+          :disabled="!typedChar || !!charError"
           @click="handleAnalyze"
         >
           开始分析
@@ -122,163 +75,110 @@
       </div>
     </div>
 
-    <!-- 拍照/选择操作面板 -->
-    <van-action-sheet
-      v-model:show="showActionSheet"
-      :actions="sheetActions"
-      cancel-text="取消"
-      close-on-click-action
-      @select="onSheetSelect"
-    />
+    <!-- 密钥输入弹窗 -->
+    <van-dialog
+      v-model:show="showKeyDialog"
+      title="输入每日密钥"
+      show-cancel-button
+      @confirm="handleKeySubmit"
+    >
+      <div style="padding: 16px;">
+        <p style="font-size:13px;color:#999;margin-bottom:8px;">
+          每天免费 2 次，输入密钥后可提至 10 次/天。密钥每日更新。
+        </p>
+        <p style="font-size:13px;color:#e8a87c;margin-bottom:12px;text-align:center;background:#fff9f0;padding:8px;border-radius:8px;">
+          🔑 添加微信：<b>kzeays</b> 可获取密钥，增加使用次数。
+        </p>
+        <van-field v-model="keyInput" placeholder="输入密钥，如 YZXJ-XXXXXXXX" maxlength="15" />
+        <p v-if="keyError" style="color:#f5222d;font-size:12px;margin-top:8px;">{{ keyError }}</p>
+      </div>
+    </van-dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCharStore } from '@/stores/charStore';
-import { fileToBase64, compressImage } from '@/utils/imageProcessor';
-import { validateImageFile } from '@/utils/validators';
 import { showError } from '@/utils/errorHandler';
+import { canAsk, recordUsage, remainingCount, refreshCount, validateAndSetKey, hasValidKey } from '@/utils/usageLimit';
 
 const router = useRouter();
 const charStore = useCharStore();
 
-// ========= Tab 状态 =========
-const activeTab = ref('camera');
-
-// ========= 拍照模式状态 =========
-const fileInputRef = ref(null);
-const imagePreview = ref('');
-const showActionSheet = ref(false);
-
-const sheetActions = [
-  { name: '拍照', value: 'camera' },
-  { name: '从相册选择', value: 'album' },
-];
-
-// ========= 直接输入模式状态 =========
-const charInputRef = ref(null);
 const typedChar = ref('');
 const charError = ref('');
-
-// ========= 共用状态 =========
 const question = ref('');
 const isAnalyzing = ref(false);
+const showKeyDialog = ref(false);
+const keyInput = ref('');
+const keyError = ref('');
 
-// ========= 计算属性 =========
-const hasContent = computed(() => {
-  if (activeTab.value === 'camera') return !!imagePreview.value;
-  return !!typedChar.value && !charError.value;
-});
+onMounted(() => refreshCount());
 
-// ========= Tab 切换 =========
-function onTabChange(name) {
-  charStore.setMode(name);
-  // 切换 tab 时清除之前的输入
-  if (name === 'camera') {
-    typedChar.value = '';
-    charError.value = '';
-  } else {
-    imagePreview.value = '';
-  }
-}
-
-// ========= 拍照模式方法 =========
-function triggerInput() {
-  fileInputRef.value?.click();
-}
-
-function onSheetSelect(action) {
-  if (action.value === 'camera') {
-    fileInputRef.value?.setAttribute('capture', 'environment');
-    triggerInput();
-    fileInputRef.value?.removeAttribute('capture');
-  } else {
-    triggerInput();
-  }
-}
-
-async function onFileSelected(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
-  event.target.value = '';
-
-  const err = validateImageFile(file);
-  if (err) {
-    showError(err);
-    return;
-  }
-
-  try {
-    let base64 = await fileToBase64(file);
-    base64 = await compressImage(base64);
-    imagePreview.value = base64;
-    charStore.setImage(base64);
-  } catch {
-    showError('图片处理失败，请重试');
-  }
-}
-
-function retake() {
-  imagePreview.value = '';
-  charStore.setImage('');
-}
-
-// ========= 直接输入方法 =========
+// 输入过滤：只保留汉字
 function onCharInput(e) {
-  // 只保留汉字
   const val = e.target.value;
   const chineseOnly = val.replace(/[^一-鿿]/g, '');
   if (chineseOnly !== val) {
     typedChar.value = chineseOnly;
   }
-
-  // 验证
   if (!typedChar.value) {
     charError.value = '';
   } else if (!/^[一-鿿]$/.test(typedChar.value)) {
     charError.value = '请输入一个有效的汉字';
   } else {
     charError.value = '';
-    charStore.setCharacter(typedChar.value);
   }
 }
 
-// ========= 提交 =========
+// 提交分析
 async function handleAnalyze() {
-  // 最终校验
-  if (activeTab.value === 'camera' && !imagePreview.value) {
-    showError('请先拍照或选择图片');
+  if (!typedChar.value) {
+    showError('请输入一个汉字');
     return;
   }
-  if (activeTab.value === 'text') {
-    if (!typedChar.value) {
-      showError('请输入一个汉字');
-      return;
-    }
-    if (!/^[一-鿿]$/.test(typedChar.value)) {
-      showError('请输入一个有效的汉字');
-      return;
-    }
+  if (!/^[一-鿿]$/.test(typedChar.value)) {
+    showError('请输入一个有效的汉字');
+    return;
+  }
+  if (!canAsk()) {
+    showKeyDialog.value = true;
+    return;
   }
 
+  charStore.setCharacter(typedChar.value);
   charStore.setQuestion(question.value.trim());
-
-  if (activeTab.value === 'camera') {
-    charStore.setImage(imagePreview.value);
-  } else {
-    charStore.setCharacter(typedChar.value);
-  }
+  charStore.setMode('text');
 
   isAnalyzing.value = true;
   const result = await charStore.analyze();
   isAnalyzing.value = false;
 
   if (result) {
+    recordUsage();
+    refreshCount();
     router.push('/result');
   } else {
     showError(charStore.error || '分析失败，请稍后再试');
+  }
+}
+
+// 密钥提交
+async function handleKeySubmit() {
+  if (!keyInput.value.trim()) {
+    keyError.value = '请输入密钥';
+    return;
+  }
+  const result = await validateAndSetKey(keyInput.value);
+  if (result.success) {
+    keyInput.value = '';
+    keyError.value = '';
+    showKeyDialog.value = false;
+    refreshCount();
+    showError('密钥验证成功！今日可提问 ' + remainingCount.value + ' 次');
+  } else {
+    keyError.value = result.message;
   }
 }
 </script>
@@ -288,103 +188,44 @@ async function handleAnalyze() {
   background: var(--bg-primary);
 }
 
-/* Tab 内容 */
-.tab-content {
-  padding-top: var(--spacing-md);
-  min-height: 60px;
-}
-
-/* ========= 拍照预览区 ========= */
-.camera-preview {
-  width: 100%;
-  aspect-ratio: 1;
-  background: var(--bg-card);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-.preview-image-container {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.preview-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.retake-btn {
-  position: absolute;
-  top: var(--spacing-xs);
-  right: var(--spacing-xs);
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border-radius: 50%;
-  padding: 6px;
-  font-size: 20px;
+/* 剩余次数 */
+.remaining-badge {
+  font-size: 12px;
+  color: var(--color-primary);
+  background: rgba(74, 144, 217, 0.1);
+  padding: 3px 8px;
+  border-radius: 10px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
-.preview-placeholder {
-  text-align: center;
-  color: var(--text-light);
-}
-
-.preview-placeholder p {
-  margin-top: var(--spacing-sm);
-  font-size: var(--font-size-sm);
-}
-
-.camera-tips {
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-md);
-  background: var(--bg-card);
-  border-radius: var(--border-radius);
-}
-
-.tip-item {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: 4px 0;
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-}
-
-.file-input {
-  display: none;
-}
-
-/* ========= 汉字输入区 ========= */
+/* 汉字输入区 */
 .char-input-area {
-  margin-top: var(--spacing-md);
+  margin-top: var(--spacing-lg);
 }
 
 .char-input {
   width: 100%;
-  height: 120px;
-  font-size: 64px;
-  font-weight: 700;
+  height: 150px;
+  font-size: 80px;
+  font-weight: 400;
   font-family: 'KaiTi', 'STKaiti', 'SimSun', serif;
   text-align: center;
-  border: 2px dashed var(--border-color);
-  border-radius: var(--border-radius);
-  background: var(--bg-card);
+  border: 2px solid var(--border-color-dark);
+  border-radius: 0;
+  background: rgba(253, 250, 242, 0.85);
   color: var(--text-title);
   outline: none;
-  caret-color: var(--color-primary);
-  transition: border-color 0.3s;
+  caret-color: #c41e3a;
+  transition: all 0.3s;
+  box-shadow: inset 0 2px 8px rgba(44, 24, 16, 0.06);
+  letter-spacing: 4px;
 }
 
 .char-input:focus {
-  border-color: var(--color-primary);
-  border-style: solid;
+  border-color: #8b4513;
+  border-width: 3px;
+  box-shadow: inset 0 2px 12px rgba(139, 69, 19, 0.1), 0 0 0 4px rgba(139, 69, 19, 0.08);
 }
 
 .char-input::placeholder {
@@ -423,7 +264,7 @@ async function handleAnalyze() {
   gap: var(--spacing-xs);
 }
 
-/* ========= 问题区 ========= */
+/* 问题区 */
 .question-section {
   margin-top: var(--spacing-lg);
 }
@@ -440,7 +281,7 @@ async function handleAnalyze() {
   background: var(--bg-card);
 }
 
-/* ========= 提交区 ========= */
+/* 提交区 */
 .submit-section {
   margin-top: var(--spacing-lg);
   padding-bottom: var(--spacing-xl);

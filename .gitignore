@@ -27,3 +27,21 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Build artifacts
+frontend-pages.zip
+yizixinjie-api.zip
+index.html
+assets/
+scf/public/
+
+# Vite cache
+frontend/.vite/
+frontend/auto-imports.d.ts
+frontend/components.d.ts
+
+# Skills (submodule)
+.claude/skills/
+
+# SCF lock
+scf/package-lock.json

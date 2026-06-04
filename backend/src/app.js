@@ -37,6 +37,25 @@ app.use('/uploads', express.static(path.resolve(__dirname, 'uploads')));
 app.use('/api', routes);
 
 // ============================================
+// 前端静态文件（生产模式）
+// ============================================
+
+const frontendDist = path.resolve(__dirname, '../../frontend/dist');
+const fs = require('fs');
+if (fs.existsSync(frontendDist)) {
+  app.use(express.static(frontendDist));
+  // SPA fallback: 所有非 API 路径返回 index.html
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(frontendDist, 'index.html'));
+    } else {
+      // API 路径没匹配到，返回 404
+      notFoundHandler(req, res);
+    }
+  });
+}
+
+// ============================================
 // 错误处理
 // ============================================
 

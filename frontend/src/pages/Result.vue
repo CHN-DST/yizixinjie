@@ -176,7 +176,7 @@
       <!-- 底部操作 -->
       <div class="result-actions">
         <van-button round block @click="$router.push('/camera')">再测一字</van-button>
-        <van-button round block type="primary" class="mt-sm" @click="$router.push('/history')">
+        <van-button round block type="primary" style="margin-top:12px;" @click="$router.push('/history')">
           查看历史记录
         </van-button>
       </div>
@@ -224,11 +224,12 @@ const hasPsychology = computed(() => {
 }
 
 .char-display {
-  font-size: 80px;
-  font-weight: 700;
-  color: var(--text-title);
-  font-family: 'KaiTi', 'STKaiti', serif;
-  line-height: 1.2;
+  font-size: 88px;
+  font-weight: 400;
+  color: #2c1810;
+  font-family: var(--font-kai);
+  line-height: 1.1;
+  text-shadow: 0 2px 8px rgba(44, 24, 16, 0.1);
 }
 
 .char-meta {
@@ -254,19 +255,21 @@ const hasPsychology = computed(() => {
 
 /* 测字取格 */
 .divination-card {
-  background: linear-gradient(135deg, #1a1a2e, #16213e);
+  background: linear-gradient(135deg, #2c1810, #3c2415);
   color: #e8d5b7;
-  border: 1px solid #3d2e1e;
+  border: 2px solid #5c3d2e;
   text-align: center;
+  box-shadow: 0 4px 16px rgba(44, 24, 16, 0.3);
 }
 
 .divination-pattern {
   font-size: var(--font-size-xl);
-  font-weight: 700;
-  font-family: 'KaiTi', 'STKaiti', serif;
-  line-height: 1.6;
+  font-weight: 400;
+  font-family: var(--font-kai);
+  line-height: 1.8;
   margin-bottom: var(--spacing-sm);
   color: #f0d78c;
+  letter-spacing: 2px;
 }
 
 .divination-wuxing {
