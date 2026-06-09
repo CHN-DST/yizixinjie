@@ -1,215 +1,328 @@
 <template>
   <div class="page-container home-page">
-    <!-- 头部装饰 -->
-    <div class="hero-section">
-      <div class="hero-content">
-        <h1 class="app-title">一字心解</h1>
-        <p class="app-subtitle">手写汉字，AI 解读你的内心</p>
-      </div>
-    </div>
+    <!-- Hero -->
+    <section class="hero">
+      <h1 class="hero-title anim-1">一字心解 · 一字见心</h1>
+      <p class="hero-sub anim-2">输入一个字，看见真实的自己</p>
+    </section>
 
-    <!-- 功能介绍 -->
-    <div class="content-container">
-      <div class="features">
-        <div class="feature-card" v-for="item in features" :key="item.title">
-          <div class="feature-icon">{{ item.icon }}</div>
-          <div class="feature-info">
-            <div class="feature-title">{{ item.title }}</div>
-            <div class="feature-desc">{{ item.desc }}</div>
-          </div>
+    <!-- 核心输入区 -->
+    <section class="content-container">
+      <div class="input-area anim-3">
+        <input
+          v-model="charInput"
+          type="text"
+          class="home-char-input"
+          maxlength="1"
+          placeholder="写一个字"
+          @input="onCharInput"
+          @keyup.enter="goAnalyze"
+        />
+        <div class="input-underline-bar" :class="{ active: charInput }"></div>
+        <p class="input-hint" v-if="!charInput">如：心、静、等、缘、悟</p>
+        <p class="input-hint valid" v-else-if="isValidChar">可测之字</p>
+        <p class="input-hint error" v-else>请输入一个有效汉字</p>
+      </div>
+
+      <div class="home-actions anim-3">
+        <button class="btn-primary home-btn" :disabled="!isValidChar" @click="goAnalyze">
+          开始测字
+        </button>
+        <button class="btn-text" @click="$router.push('/history')">
+          测字历史 →
+        </button>
+      </div>
+    </section>
+
+    <!-- 今日解字 -->
+    <section class="content-container anim-4">
+      <div class="daily-section">
+        <p class="daily-label">今日解字</p>
+        <div class="daily-card" @click="goDailyChar">
+          <span class="daily-char">{{ dailyChar.char }}</span>
+          <span class="daily-hint">{{ dailyChar.hint }}</span>
+          <span class="daily-arrow">→</span>
         </div>
       </div>
+    </section>
 
-      <!-- 开始按钮 -->
-      <van-button
-        type="primary"
-        size="large"
-        block
-        class="start-btn"
-        @click="$router.push('/camera')"
-      >
-        开始测字
-      </van-button>
-
-      <!-- 今日统计 -->
-      <div class="stats-bar">
-        <span>👀 访问人数 {{ todayStats.views }} 人</span>
-        <span class="stats-divider">|</span>
-        <span>🔮 一共测字 {{ todayStats.analyzes }} 次</span>
-      </div>
-
-      <!-- 底部导航 -->
-      <div class="home-nav">
-        <span @click="$router.push('/history')">历史记录</span>
-        <span class="nav-divider">|</span>
-        <span @click="$router.push('/about')">关于</span>
-      </div>
-    </div>
+    <!-- 页脚 -->
+    <footer class="home-footer anim-5">
+      <p class="footer-desc">东方哲学 × AI 测字</p>
+      <button class="btn-text about-link" @click="$router.push('/about')">关于这个网站 →</button>
+    </footer>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { useCharStore } from '@/stores/charStore';
 
-const todayStats = ref({ views: 0, analyzes: 0 });
+const router = useRouter();
+const charStore = useCharStore();
 
-onMounted(async () => {
-  const url = 'https://1439501934-k13421vmpj.ap-guangzhou.tencentscf.com';
+const charInput = ref('');
 
-  // 1. 立即显示缓存的统计数据
-  try {
-    const cached = localStorage.getItem('yzxj_today_stats');
-    if (cached) todayStats.value = JSON.parse(cached);
-  } catch {}
-
-  // 2. 首次访问：计数
-  if (!sessionStorage.getItem('yzxj_pinged')) {
-    sessionStorage.setItem('yzxj_pinged', '1');
-    fetch(url + '/ping', { method: 'POST' }).catch(() => {});
-  }
-
-  // 3. 后台静默获取最新统计
-  try {
-    const resp = await fetch(url + '/stats');
-    const data = await resp.json();
-    if (data.success && data.data?.length) {
-      todayStats.value = data.data[0];
-      localStorage.setItem('yzxj_today_stats', JSON.stringify(data.data[0]));
-    }
-  } catch {}
+const isValidChar = computed(() => {
+  return charInput.value && /^[一-鿿]$/.test(charInput.value);
 });
 
-const features = [
-  {
-    icon: '🔍',
-    title: '字源解析',
-    desc: '追溯汉字起源，解读甲骨文金文',
-  },
-  {
-    icon: '🎭',
-    title: '文化洞察',
-    desc: '探索汉字背后的文化象征意义',
-  },
+// 今日解字 — 按日期轮换
+const dailyChars = [
+  { char: '静', hint: '静能生慧，今日宜静心' },
+  { char: '等', hint: '等待是最好的答案' },
+  { char: '缘', hint: '缘起缘灭，顺其自然' },
+  { char: '悟', hint: '觉悟只在转念之间' },
+  { char: '舍', hint: '有舍才有得' },
+  { char: '安', hint: '心安即是归处' },
+  { char: '信', hint: '信者，人言也，诚在其中' },
 ];
+
+const dailyChar = computed(() => {
+  return dailyChars[new Date().getDate() % dailyChars.length];
+});
+
+function onCharInput(e) {
+  const val = e.target.value;
+  const chineseOnly = val.replace(/[^一-鿿]/g, '');
+  if (chineseOnly !== val) charInput.value = chineseOnly;
+}
+
+function goAnalyze() {
+  if (!isValidChar.value) return;
+  charStore.setCharacter(charInput.value);
+  charStore.setQuestion('');
+  charStore.setMode('text');
+  router.push('/camera');
+}
+
+function goAnalyzeWithQuestion() {
+  if (isValidChar.value) {
+    charStore.setCharacter(charInput.value);
+    charStore.setQuestion('');
+    charStore.setMode('text');
+  }
+  router.push('/camera');
+}
+
+function goDailyChar() {
+  charStore.setCharacter(dailyChar.value.char);
+  charStore.setQuestion('');
+  charStore.setMode('text');
+  router.push('/camera');
+}
 </script>
 
 <style scoped>
-.home-page {
-  background: var(--bg-primary);
-}
-
-/* 英雄区 */
-.hero-section {
-  padding: 60px 0 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.hero-content {
+/* ============================================================
+   Hero
+   ============================================================ */
+.hero {
   text-align: center;
+  padding: var(--space-24) var(--space-4) var(--space-12);
 }
 
-.app-title {
-  font-size: 40px;
+.hero-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-4xl);
   font-weight: 700;
-  letter-spacing: 10px;
-  margin-bottom: var(--spacing-xs);
-  color: #3a2f28;
-  font-family: 'KaiTi', 'STKaiti', serif;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  color: var(--color-ink-900);
+  letter-spacing: 0.08em;
+  line-height: 1.2;
 }
 
-.app-subtitle {
-  font-size: var(--font-size-sm);
-  color: #8b7355;
-  letter-spacing: 6px;
+.hero-sub {
+  font-size: var(--text-base);
+  color: var(--color-ink-500);
+  margin-top: var(--space-4);
+  letter-spacing: 0.04em;
 }
 
-/* 功能卡片 */
-.features {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--spacing-sm);
+/* ============================================================
+   输入区
+   ============================================================ */
+.input-area {
+  margin-bottom: var(--space-6);
+  text-align: center;
 }
 
-.feature-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-sm);
+.home-char-input {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  display: block;
+  height: 64px;
+  font-size: var(--text-3xl);
+  font-family: var(--font-kai);
+  text-align: center;
+  color: var(--color-ink-900);
+  border-bottom: 1.5px solid var(--color-ink-200);
+  transition: border-color var(--transition-normal);
+  background: transparent;
+  padding: 8px 0;
+  letter-spacing: 0.06em;
+}
+
+.home-char-input:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+.home-char-input::placeholder {
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  color: var(--color-ink-400);
+  letter-spacing: 0.04em;
+}
+
+.input-underline-bar {
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+  height: 1.5px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transition: transform var(--transition-normal);
+  margin-top: -1.5px;
+}
+
+.input-underline-bar.active {
+  transform: scaleX(1);
+}
+
+.input-hint {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-ink-400);
+  letter-spacing: 0.03em;
+}
+
+.input-hint.valid {
+  color: var(--color-accent);
+}
+
+.input-hint.error {
+  color: var(--color-danger);
+}
+
+/* ============================================================
+   操作按钮
+   ============================================================ */
+.home-actions {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-12);
+}
+
+.home-btn {
+  min-width: 200px;
+}
+
+/* ============================================================
+   今日解字
+   ============================================================ */
+.daily-section {
+  margin-bottom: var(--space-16);
+}
+
+.daily-label {
+  font-size: var(--text-xs);
+  color: var(--color-ink-400);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: var(--space-3);
+  padding-left: var(--space-1);
+}
+
+.daily-card {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  transition: all var(--transition-fast);
-}
-
-.feature-card:active {
-  transform: scale(0.97);
-  box-shadow: var(--shadow-md);
-}
-
-.feature-icon { font-size: 28px; flex-shrink: 0; }
-.feature-title { font-size: var(--font-size-sm); font-weight: 600; color: var(--text-title); }
-.feature-desc { font-size: var(--font-size-xs); color: var(--text-secondary); margin-top: 2px; }
-
-/* 开始按钮 — 印章风格 */
-.start-btn {
-  margin-top: var(--spacing-xl);
-  height: 54px;
-  font-size: var(--font-size-lg);
-  letter-spacing: 8px;
-  font-family: var(--font-kai);
-  background: linear-gradient(180deg, #B5432E 0%, #8B2A1A 60%, #6B1A0E 100%) !important;
-  border: 2px solid #5C1F14 !important;
-  border-radius: var(--border-radius) !important;
-  box-shadow: 0 4px 14px rgba(107, 26, 14, 0.4), inset 0 1px 0 rgba(255,255,255,0.12) !important;
-  transition: all var(--transition-fast) !important;
-  position: relative;
-}
-
-.start-btn:active {
-  transform: scale(0.96);
-  box-shadow: 0 2px 6px rgba(107, 26, 14, 0.5) !important;
-}
-
-/* 统计条 */
-.stats-bar {
-  text-align: center;
-  margin-top: var(--spacing-md);
-  padding: var(--spacing-sm);
-  background: #f0f7ff;
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-xs);
-  color: var(--color-primary);
-}
-.stats-divider {
-  margin: 0 8px;
-  color: #ccc;
-}
-
-/* 底部导航 */
-.home-nav {
-  text-align: center;
-  margin-top: var(--spacing-lg);
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-}
-
-.home-nav span {
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
+  background: #fff;
+  border: 1px solid var(--color-ink-150);
+  border-radius: var(--radius-md);
   cursor: pointer;
-  padding: var(--spacing-xs);
+  transition: all var(--transition-normal);
 }
 
-.home-nav span:hover {
-  color: var(--color-primary);
+.daily-card:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
+  border-color: var(--color-gold-border);
 }
 
-.nav-divider {
-  margin: 0 var(--spacing-xs);
-  cursor: default !important;
+.daily-char {
+  font-family: var(--font-kai);
+  font-size: var(--text-2xl);
+  color: var(--color-ink-900);
+  flex-shrink: 0;
+}
+
+.daily-hint {
+  flex: 1;
+  font-size: var(--text-base);
+  color: var(--color-ink-600);
+  letter-spacing: 0.03em;
+}
+
+.daily-arrow {
+  font-size: var(--text-lg);
+  color: var(--color-ink-400);
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   页脚
+   ============================================================ */
+.home-footer {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.footer-brand {
+  font-family: var(--font-serif);
+  font-size: var(--text-sm);
+  color: var(--color-ink-600);
+  letter-spacing: 0.06em;
+}
+
+.footer-desc {
+  font-size: var(--text-xs);
+  color: var(--color-ink-400);
+  margin-top: var(--space-1);
+  letter-spacing: 0.04em;
+}
+
+.about-link {
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-ink-400);
+}
+
+/* ============================================================
+   入场动画
+   ============================================================ */
+.anim-1 { animation: fadeInUp 0.6s var(--ease-out) both; }
+.anim-2 { animation: fadeInUp 0.5s var(--ease-out) 0.2s both; }
+.anim-3 { animation: fadeInUp 0.5s var(--ease-out) 0.4s both; }
+.anim-4 { animation: fadeInUp 0.5s var(--ease-out) 0.7s both; }
+.anim-5 { animation: fadeIn 0.4s var(--ease-out) 1s both; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (min-width: 640px) {
+  .hero-title { font-size: 56px; }
 }
 </style>

@@ -1,144 +1,254 @@
 <template>
   <div class="page-container about-page">
-    <!-- 顶部导航 -->
-    <van-nav-bar title="关于" left-text="返回" left-arrow @click-left="$router.back()" fixed placeholder />
+    <van-nav-bar left-text="←" @click-left="$router.back()" fixed placeholder />
 
     <div class="content-container">
-      <!-- 应用信息 -->
-      <div class="about-header">
-        <div class="about-logo">心</div>
-        <h2 class="about-title">一字心解</h2>
-        <p class="about-version">v1.0.0</p>
-      </div>
+      <!-- 头部 -->
+      <header class="about-header">
+        <p class="about-char">心</p>
+        <h1 class="about-name">一字心解</h1>
+        <p class="about-tagline">一字见心</p>
+      </header>
 
-      <!-- 介绍 -->
-      <div class="card">
-        <div class="card-text">
-          汉字是世界上最古老的文字之一，每一个汉字都承载着数千年的文化记忆。
-          「一字心解」运用 AI 视觉识别技术，从字源学、文化学、心理学三个维度，
-          为你解读每一个手写汉字的深层内涵。
-        </div>
-      </div>
+      <!-- 项目简介 -->
+      <section class="about-section">
+        <h2 class="section-title">项目简介</h2>
+        <p class="section-text">
+          一字心解是一款融合 AI 与中国古代测字术的 Web 应用。
+          用户输入一个汉字，AI 从字源学、文化学、字相学三个维度进行深度解析，
+          结合古籍智慧给出个性化解读与成长建议。
+        </p>
+      </section>
 
-      <!-- 分析维度 -->
-      <div class="dimensions">
-        <div class="dim-card">
-          <div class="dim-icon">🔍</div>
-          <div class="dim-title">字源学</div>
-          <div class="dim-desc">
-            追溯汉字的甲骨文、金文、小篆形态，了解造字本义和演变历程。
+      <!-- 技术架构 -->
+      <section class="about-section">
+        <h2 class="section-title">技术架构</h2>
+        <div class="tech-list">
+          <div class="tech-item">
+            <span class="tech-label">前端</span>
+            <span class="tech-value">Vue 3 · Vite · Vant 4 · Pinia · Vue Router</span>
+          </div>
+          <div class="tech-item">
+            <span class="tech-label">后端</span>
+            <span class="tech-value">Node.js 18 · 腾讯云 SCF（Serverless）</span>
+          </div>
+          <div class="tech-item">
+            <span class="tech-label">AI</span>
+            <span class="tech-value">DeepSeek Chat API</span>
+          </div>
+          <div class="tech-item">
+            <span class="tech-label">数据库</span>
+            <span class="tech-value">Supabase（PostgreSQL）</span>
+          </div>
+          <div class="tech-item">
+            <span class="tech-label">部署</span>
+            <span class="tech-value">Cloudflare Pages + 腾讯云 SCF</span>
           </div>
         </div>
-        <div class="dim-card">
-          <div class="dim-icon">🎭</div>
-          <div class="dim-title">文化学</div>
-          <div class="dim-desc">
-            探索汉字在中国传统文化中的象征意义和在经典文献中的运用。
+      </section>
+
+      <!-- 参考书籍 -->
+      <section class="about-section">
+        <h2 class="section-title">参考古籍</h2>
+        <div class="book-list">
+          <div class="book-item">
+            <span class="book-title">《测字秘牒》</span>
+            <span class="book-author">清 · 程省</span>
+            <p class="book-desc">测字术经典著作，系统阐述装头、接脚、穿心、破解、对关五法。</p>
+          </div>
+          <div class="book-item">
+            <span class="book-title">《心易六法》</span>
+            <span class="book-author">清 · 程省</span>
+            <p class="book-desc">象形、会意、谐声、假借、指事、转注六义测字心法。</p>
+          </div>
+          <div class="book-item">
+            <span class="book-title">《说文解字》</span>
+            <span class="book-author">东汉 · 许慎</span>
+            <p class="book-desc">汉字字源学奠基之作，系统分析汉字字形与字义的关系。</p>
           </div>
         </div>
-        <div class="dim-card">
-          <div class="dim-icon">🧠</div>
-          <div class="dim-title">心理学</div>
-          <div class="dim-desc">
-            从笔画结构和书写方式中，洞察书写者的性格和心理状态。
-          </div>
-        </div>
-      </div>
+      </section>
 
-      <!-- 技术说明 -->
-      <div class="card">
-        <div class="card-title">技术说明</div>
-        <div class="card-text">
-          本应用使用 DeepSeek Vision API 进行汉字识别与多维度分析。
-          前端基于 Vue3 + Vite + Vant，后端使用 Node.js + Express。
-          您的图片仅用于当前分析，不会被长期存储。
-        </div>
-      </div>
+      <!-- 开源信息 -->
+      <section class="about-section">
+        <h2 class="section-title">开源地址</h2>
+        <a
+          class="github-link"
+          href="https://github.com/CHN-DST/yizixinjie"
+          target="_blank"
+          rel="noopener"
+        >
+          <span>GitHub</span>
+          <span>CHN-DST/yizixinjie</span>
+          <span class="link-arrow">↗</span>
+        </a>
+      </section>
 
-      <!-- 免责声明 -->
-      <div class="disclaimer">
-        <p>⚠️ 免责声明：心理分析仅供参考，不构成专业心理咨询建议。</p>
-        <p>如有心理困扰，请寻求专业心理咨询师的帮助。</p>
-      </div>
+      <!-- 声明 -->
+      <p class="about-disclaimer">
+        测字分析仅供娱乐参考，不构成专业心理咨询建议。
+        如有心理困扰，请寻求专业帮助。
+      </p>
     </div>
   </div>
 </template>
 
 <script setup>
-// 纯展示页面，无需额外逻辑
 </script>
 
 <style scoped>
 .about-page {
-  background: var(--bg-primary);
+  background: var(--color-ink-50);
 }
 
 /* 头部 */
 .about-header {
   text-align: center;
-  padding: var(--spacing-xl) 0;
+  padding: var(--space-16) 0 var(--space-10);
 }
 
-.about-logo {
+.about-char {
+  font-family: var(--font-kai);
   font-size: 64px;
-  font-family: 'KaiTi', 'STKaiti', serif;
-  color: var(--color-primary);
-  margin-bottom: var(--spacing-sm);
+  color: var(--color-ink-900);
+  line-height: 1;
+  margin-bottom: var(--space-4);
 }
 
-.about-title {
-  font-size: var(--font-size-xxl);
-  color: var(--text-title);
-  letter-spacing: 8px;
+.about-name {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  color: var(--color-ink-900);
+  letter-spacing: 0.08em;
 }
 
-.about-version {
-  font-size: var(--font-size-sm);
-  color: var(--text-light);
-  margin-top: 4px;
+.about-tagline {
+  font-size: var(--text-base);
+  color: var(--color-ink-500);
+  margin-top: var(--space-2);
+  letter-spacing: 0.06em;
 }
 
-/* 维度卡片 */
-.dimensions {
+/* 内容区 */
+.about-section {
+  margin-bottom: var(--space-10);
+}
+
+.section-title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink-800);
+  letter-spacing: 0.06em;
+  margin-bottom: var(--space-4);
+  padding-left: var(--space-2);
+  border-left: 2px solid var(--color-primary);
+}
+
+.section-text {
+  font-size: var(--text-base);
+  color: var(--color-ink-600);
+  line-height: 2;
+}
+
+/* 技术列表 */
+.tech-list {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-sm);
-  margin-bottom: var(--spacing-md);
+  gap: var(--space-2);
 }
 
-.dim-card {
-  background: var(--bg-card);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
-  box-shadow: var(--shadow-sm);
+.tech-item {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--color-ink-150);
+  font-size: var(--text-sm);
 }
 
-.dim-icon {
-  font-size: 28px;
-  margin-bottom: 4px;
+.tech-item:last-child {
+  border-bottom: none;
 }
 
-.dim-title {
-  font-size: var(--font-size-md);
+.tech-label {
+  flex-shrink: 0;
+  min-width: 52px;
+  color: var(--color-ink-400);
+  font-weight: 500;
+}
+
+.tech-value {
+  color: var(--color-ink-700);
+}
+
+/* 书籍列表 */
+.book-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.book-item {
+  padding: var(--space-4);
+  background: #fff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-ink-150);
+}
+
+.book-title {
+  font-size: var(--text-md);
   font-weight: 600;
-  color: var(--text-title);
-  margin-bottom: 4px;
+  color: var(--color-ink-900);
+  font-family: var(--font-serif);
 }
 
-.dim-desc {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+.book-author {
+  font-size: var(--text-xs);
+  color: var(--color-ink-400);
+  margin-left: var(--space-2);
+}
+
+.book-desc {
+  font-size: var(--text-sm);
+  color: var(--color-ink-500);
+  margin-top: var(--space-2);
   line-height: 1.7;
 }
 
-/* 免责 */
-.disclaimer {
-  margin-top: var(--spacing-lg);
-  padding: var(--spacing-md);
-  background: #fff8e1;
-  border-radius: var(--border-radius-sm);
-  font-size: var(--font-size-xs);
-  color: #8d6e00;
+/* GitHub */
+.github-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: #fff;
+  border: 1px solid var(--color-ink-150);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  color: var(--color-ink-800);
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.github-link:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.link-arrow {
+  margin-left: auto;
+  color: var(--color-ink-400);
+}
+
+/* 声明 */
+.about-disclaimer {
+  font-size: var(--text-xs);
+  color: var(--color-ink-400);
   line-height: 1.8;
+  text-align: center;
+  padding: var(--space-4);
+  background: var(--color-ink-100);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-16);
 }
 </style>

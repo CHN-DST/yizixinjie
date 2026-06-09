@@ -1,7 +1,6 @@
 <template>
   <footer class="app-footer">
-    <p>一字心解 &copy; {{ year }}</p>
-    <p class="footer-note">手写汉字 · AI 解读 · 探索内心</p>
+    <p class="footer-text">一字心解 &copy; {{ year }}</p>
   </footer>
 </template>
 
@@ -12,13 +11,12 @@ const year = new Date().getFullYear();
 <style scoped>
 .app-footer {
   text-align: center;
-  padding: var(--spacing-lg) var(--spacing-md);
-  color: var(--text-light);
-  font-size: var(--font-size-xs);
+  padding: var(--space-6) var(--space-4);
 }
 
-.footer-note {
-  margin-top: 4px;
-  opacity: 0.6;
+.footer-text {
+  font-size: var(--text-xs);
+  color: var(--color-ink-400);
+  letter-spacing: 0.04em;
 }
 </style>

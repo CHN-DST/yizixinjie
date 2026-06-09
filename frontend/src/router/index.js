@@ -11,7 +11,7 @@ const routes = [
     path: '/camera',
     name: 'Camera',
     component: () => import('@/pages/Camera.vue'),
-    meta: { title: '拍照上传' },
+    meta: { title: '输入测字' },
   },
   {
     path: '/result',
@@ -24,6 +24,12 @@ const routes = [
     name: 'History',
     component: () => import('@/pages/History.vue'),
     meta: { title: '历史记录' },
+  },
+  {
+    path: '/admin',
+    name: 'Admin',
+    component: () => import('@/pages/Admin.vue'),
+    meta: { title: '后台管理' },
   },
   {
     path: '/about',

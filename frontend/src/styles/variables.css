@@ -1,61 +1,171 @@
+/* ============================================================
+   一字心解 · Modern Eastern 设计系统
+   宣纸白 · 墨灰 · 鎏金 · 朱砂 · 青墨
+   克制 · 留白 · 呼吸感
+   ============================================================ */
+
 :root {
-  /* ========= 古风配色（基于 UI/UX Pro Max 设计系统） ========= */
-  --color-primary: #8B3A2A;
-  --color-primary-dark: #5C1F14;
-  --color-primary-light: #A0523D;
-  --color-accent: #C1783A;
-  --color-accent-light: #D4955A;
-  --color-gold: #B8954A;
-  --color-gold-light: #D4B86A;
-  --color-success: #4A6741;
-  --color-warning: #B8860B;
-  --color-danger: #B22222;
+  /* ============================================================
+     墨灰 — 文字主色
+     ============================================================ */
+  --color-ink-900: #1a1714;
+  --color-ink-800: #2d2a24;
+  --color-ink-700: #3d3a33;
+  --color-ink-600: #6b6358;
+  --color-ink-500: #8a8278;
+  --color-ink-400: #a8a094;
+  --color-ink-300: #c5bfb4;
+  --color-ink-200: #e0dbd2;
+  --color-ink-150: #ece8e0;
+  --color-ink-100: #f3f0eb;
+  --color-ink-75: #f7f5f1;
+  --color-ink-50: #faf9f7;
 
-  /* ========= 宣纸底色 ========= */
-  --bg-primary: rgba(245, 238, 220, 0.4);
-  --bg-secondary: rgba(252, 248, 240, 0.92);
-  --bg-card: rgba(253, 250, 244, 0.94);
-  --bg-card-hover: rgba(253, 250, 244, 0.98);
-  --bg-dark: #2C1810;
+  /* ============================================================
+     鎏金 — 强调色（链接、标签、hover、聚焦装饰）
+     ============================================================ */
+  --color-accent: #a0845c;
+  --color-accent-light: #b8996e;
+  --color-accent-dark: #7a6038;
+  --color-accent-bg: rgba(160, 132, 92, 0.08);
+  --color-accent-border: rgba(160, 132, 92, 0.2);
 
-  /* ========= 墨色文字（WCAG AA 4.5:1+） ========= */
-  --text-primary: #2C1810;
-  --text-secondary: #6B5040;
-  --text-light: #A08870;
-  --text-white: #FDF8F0;
-  --text-title: #1A0E08;
+  /* ============================================================
+     青墨绿 — 辅助色（成功状态、次要标识）
+     ============================================================ */
+  --color-sage: #4a7c5c;
+  --color-sage-light: #6b9b7d;
+  --color-sage-bg: rgba(74, 124, 92, 0.06);
 
-  /* ========= 绢丝边框 ========= */
-  --border-color: #D0C0A8;
-  --border-color-dark: #A89078;
-  --border-radius: 4px;
-  --border-radius-sm: 2px;
+  /* ============================================================
+     暖金 — 装饰点缀
+     ============================================================ */
+  --color-warm: #c47a4a;
+  --color-warm-light: #d4956a;
+  --color-warm-dark: #a06030;
+  --color-warm-bg: rgba(196, 122, 74, 0.06);
+  --color-gold: #c9a86c;
+  --color-gold-light: #dbc08a;
+  --color-gold-bg: rgba(201, 168, 108, 0.08);
+  --color-gold-border: rgba(201, 168, 108, 0.25);
 
-  /* ========= 水墨阴影（多层柔光） ========= */
-  --shadow-sm: 0 1px 3px rgba(44, 24, 16, 0.05), 0 1px 2px rgba(44, 24, 16, 0.04);
-  --shadow-md: 0 4px 12px rgba(44, 24, 16, 0.08), 0 2px 4px rgba(44, 24, 16, 0.04);
-  --shadow-lg: 0 8px 24px rgba(44, 24, 16, 0.12), 0 4px 8px rgba(44, 24, 16, 0.06);
+  /* ============================================================
+     朱砂 — 核心 CTA 与关键强调
+     ============================================================ */
+  --color-primary: #b5342e;
+  --color-primary-light: #c9504a;
+  --color-primary-dark: #8a1f1a;
+  --color-primary-bg: rgba(181, 52, 46, 0.06);
 
-  /* ========= 字体 ========= */
-  --font-family: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', -apple-system, sans-serif;
+  /* ============================================================
+     功能色
+     ============================================================ */
+  --color-success: #4a7c5c;
+  --color-warning: #c4812a;
+  --color-danger: #c0392b;
+
+  /* ============================================================
+     兼容旧 token
+     ============================================================ */
+  --bg-primary: var(--color-ink-50);
+  --bg-secondary: rgba(255, 255, 255, 0.92);
+  --bg-card: #ffffff;
+  --bg-card-hover: #faf9f7;
+  --bg-dark: var(--color-ink-900);
+
+  --text-primary: var(--color-ink-900);
+  --text-secondary: var(--color-ink-600);
+  --text-light: var(--color-ink-400);
+  --text-white: #ffffff;
+  --text-title: var(--color-ink-900);
+
+  --border-color: var(--color-ink-200);
+  --border-color-light: var(--color-ink-150);
+  --border-color-dark: var(--color-ink-300);
+
+  /* ============================================================
+     圆角
+     ============================================================ */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ============================================================
+     阴影
+     ============================================================ */
+  --shadow-xs: 0 1px 2px rgba(26, 23, 20, 0.04);
+  --shadow-sm: 0 1px 3px rgba(26, 23, 20, 0.05), 0 1px 2px rgba(26, 23, 20, 0.03);
+  --shadow-md: 0 4px 12px rgba(26, 23, 20, 0.06), 0 1px 3px rgba(26, 23, 20, 0.04);
+  --shadow-lg: 0 8px 24px rgba(26, 23, 20, 0.08), 0 2px 6px rgba(26, 23, 20, 0.04);
+  --shadow-card-hover: 0 6px 20px rgba(26, 23, 20, 0.08), 0 1px 4px rgba(26, 23, 20, 0.04);
+
+  /* ============================================================
+     字体
+     ============================================================ */
+  --font-sans: 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', 'STSong', serif;
   --font-kai: 'KaiTi', 'STKaiti', 'SimKai', 'AR PL UKai CN', serif;
-  --font-serif: 'Noto Serif SC', 'Source Han Serif SC', 'SimSun', serif;
-  --font-size-xs: 12px;
-  --font-size-sm: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 22px;
-  --font-size-xxl: 30px;
+  --font-family: var(--font-sans);
 
-  /* ========= 间距（44x44px 触摸目标） ========= */
-  --spacing-xs: 8px;
-  --spacing-sm: 12px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
+  /* ============================================================
+     字号
+     ============================================================ */
+  --text-2xs: 10px;
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 15px;
+  --text-md: 17px;
+  --text-lg: 20px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
+  --text-3xl: 40px;
+  --text-4xl: 48px;
 
-  /* ========= 动效（200-300ms 平滑过渡） ========= */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 350ms ease;
+  --font-size-xs: var(--text-xs);
+  --font-size-sm: var(--text-sm);
+  --font-size-md: var(--text-base);
+  --font-size-lg: var(--text-lg);
+  --font-size-xl: var(--text-xl);
+  --font-size-xxl: var(--text-2xl);
+
+  /* ============================================================
+     间距
+     ============================================================ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+
+  --spacing-xs: var(--space-2);
+  --spacing-sm: var(--space-3);
+  --spacing-md: var(--space-4);
+  --spacing-lg: var(--space-6);
+  --spacing-xl: var(--space-10);
+  --spacing-xxl: var(--space-16);
+
+  /* ============================================================
+     动效
+     ============================================================ */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --duration-page: 500ms;
+
+  --transition-fast: var(--duration-fast) var(--ease-out);
+  --transition-normal: var(--duration-normal) var(--ease-out);
+  --transition-slow: var(--duration-slow) var(--ease-out);
 }

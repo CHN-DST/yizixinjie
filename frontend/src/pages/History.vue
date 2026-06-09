@@ -1,49 +1,41 @@
 <template>
   <div class="page-container history-page">
-    <!-- 顶部导航 -->
     <van-nav-bar
-      title="历史记录"
-      left-text="返回"
-      left-arrow
+      left-text="←"
       @click-left="$router.back()"
       fixed
       placeholder
     >
       <template #right>
-        <span v-if="charStore.historyCount > 0" class="clear-btn" @click="handleClear">
-          清空
-        </span>
+        <span v-if="charStore.historyCount > 0" class="clear-btn" @click="handleClear">清空</span>
       </template>
     </van-nav-bar>
 
     <div class="content-container">
-      <!-- 有历史记录 -->
       <template v-if="charStore.historyCount > 0">
+        <p class="history-count-text">{{ charStore.historyCount }} 条记录</p>
         <div
           v-for="record in charStore.history"
           :key="record.id"
-          class="history-card"
+          class="history-item"
           @click="viewDetail(record)"
         >
-          <div class="history-char">{{ record.character }}</div>
+          <span class="history-char">{{ record.character }}</span>
           <div class="history-info">
-            <div class="history-pinyin" v-if="record.pronunciation">
-              {{ record.pronunciation }}
-            </div>
-            <div class="history-preview" v-if="record.psychology?.writerInsight">
-              {{ truncate(record.psychology.writerInsight, 40) }}
-            </div>
+            <span class="history-preview" v-if="record.psychology?.writerInsight">
+              {{ truncate(record.psychology.writerInsight, 35) }}
+            </span>
+            <span class="history-preview" v-else>点击查看完整解析</span>
           </div>
-          <div class="history-time">{{ formatRelativeTime(record.timestamp) }}</div>
-        </div>
-
-        <div class="history-count">
-          共 {{ charStore.historyCount }} 条记录
+          <span class="history-time">{{ formatRelativeTime(record.timestamp) }}</span>
         </div>
       </template>
 
-      <!-- 空状态 -->
-      <van-empty v-else description="暂无历史记录" />
+      <div v-else class="empty-state">
+        <p class="empty-char">字</p>
+        <p class="empty-desc">暂无历史记录</p>
+        <button class="btn-text" @click="$router.push('/camera')">去测字 →</button>
+      </div>
     </div>
   </div>
 </template>
@@ -57,13 +49,11 @@ import { showConfirm } from '@/utils/errorHandler';
 const router = useRouter();
 const charStore = useCharStore();
 
-// 截断文本
 function truncate(text, max) {
   if (!text || text.length <= max) return text;
   return text.substring(0, max) + '...';
 }
 
-// 查看详情
 function viewDetail(record) {
   charStore.currentResult = {
     character: record.character,
@@ -73,86 +63,97 @@ function viewDetail(record) {
     etymology: record.etymology,
     culture: record.culture,
     psychology: record.psychology,
+    divination: record.divination,
+    characterDeconstruction: record.characterDeconstruction,
     timestamp: record.timestamp,
   };
   router.push('/result');
 }
 
-// 清空历史
 async function handleClear() {
   const confirmed = await showConfirm('确定要清空所有历史记录吗？');
-  if (confirmed) {
-    charStore.clearHistory();
-  }
+  if (confirmed) charStore.clearHistory();
 }
 </script>
 
 <style scoped>
 .history-page {
-  background: var(--bg-primary);
+  background: var(--color-ink-50);
+}
+
+.history-count-text {
+  font-size: var(--text-xs);
+  color: var(--color-ink-400);
+  letter-spacing: 0.05em;
+  margin: var(--space-6) 0 var(--space-4);
 }
 
 .clear-btn {
+  font-size: var(--text-xs);
   color: var(--color-danger);
-  font-size: var(--font-size-sm);
   cursor: pointer;
 }
 
-/* 历史卡片 */
-.history-card {
+.history-item {
   display: flex;
   align-items: center;
-  background: var(--bg-card);
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
-  box-shadow: var(--shadow-sm);
+  gap: var(--space-3);
+  padding: var(--space-4);
+  background: #fff;
+  border: 1px solid var(--color-ink-150);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-2);
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all var(--transition-normal);
 }
 
-.history-card:active {
-  transform: scale(0.98);
+.history-item:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
 }
 
 .history-char {
-  font-size: 36px;
-  font-weight: 700;
-  color: var(--text-title);
-  font-family: 'KaiTi', 'STKaiti', serif;
-  min-width: 60px;
+  font-family: var(--font-kai);
+  font-size: 28px;
+  color: var(--color-ink-900);
+  flex-shrink: 0;
+  width: 44px;
   text-align: center;
 }
 
 .history-info {
   flex: 1;
-  padding: 0 var(--spacing-sm);
-}
-
-.history-pinyin {
-  font-size: var(--font-size-sm);
-  color: var(--color-primary);
-  font-style: italic;
+  min-width: 0;
 }
 
 .history-preview {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-  margin-top: 4px;
-  line-height: 1.4;
+  font-size: var(--text-sm);
+  color: var(--color-ink-500);
+  line-height: 1.5;
 }
 
 .history-time {
-  font-size: var(--font-size-xs);
-  color: var(--text-light);
-  white-space: nowrap;
+  font-size: var(--text-2xs);
+  color: var(--color-ink-400);
+  flex-shrink: 0;
 }
 
-/* 计数 */
-.history-count {
+/* 空状态 */
+.empty-state {
   text-align: center;
-  margin-top: var(--spacing-lg);
-  font-size: var(--font-size-xs);
-  color: var(--text-light);
+  padding-top: 100px;
+}
+
+.empty-char {
+  font-family: var(--font-kai);
+  font-size: 48px;
+  color: var(--color-ink-300);
+  margin-bottom: var(--space-3);
+}
+
+.empty-desc {
+  font-size: var(--text-base);
+  color: var(--color-ink-400);
+  margin-bottom: var(--space-4);
 }
 </style>

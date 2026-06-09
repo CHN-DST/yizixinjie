@@ -9,61 +9,59 @@ const crypto = require('crypto');
 const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
 const KEY_SECRET = 'yizixinjie2026!';
-const STATS_BLOB_ID = '019e8c8e-e512-7565-af11-96a2c7970ab4';
-const STATS_URL = `https://jsonblob.com/api/jsonBlob/${STATS_BLOB_ID}`;
 
-// 内存缓存，避免每次读写都调 API
-let statsCache = null;
-let cacheTime = 0;
+// ==================== Supabase 数据库 ====================
+const SUPABASE_URL = 'https://gobuofltakjowzpqetwf.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_iL4QzFPXmjLiiHKBYY4ZOQ_OlyCE1vs';
+const ADMIN_PASSWORD = 'yizixinjie2026';
 
-// ==================== 访问统计（jsonblob.com 云存储，多实例共享） ====================
-async function loadStats() {
-  if (statsCache && Date.now() - cacheTime < 30000) return statsCache;
+async function saveRecord(ip, character, question, result) {
   try {
-    const resp = await axios.get(STATS_URL, { timeout: 3000 });
-    statsCache = resp.data;
-    cacheTime = Date.now();
-    return statsCache;
-  } catch { return statsCache || {}; }
-}
-
-async function saveStats(stats) {
-  statsCache = stats;
-  cacheTime = Date.now();
-  try { await axios.put(STATS_URL, stats, { headers: { 'Content-Type': 'application/json' }, timeout: 5000 }); } catch {}
-}
-
-function getToday() {
-  const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-
-async function trackVisit() {
-  const stats = await loadStats();
-  const today = getToday();
-  if (!stats[today]) stats[today] = { views: 0, analyzes: 0 };
-  stats[today].views++;
-  await saveStats(stats);
-}
-
-async function trackAnalyze() {
-  const stats = await loadStats();
-  const today = getToday();
-  if (!stats[today]) stats[today] = { views: 0, analyzes: 0 };
-  stats[today].analyzes++;
-  await saveStats(stats);
-}
-
-async function getStatsData(days = 7) {
-  const stats = await loadStats();
-  const result = [];
-  for (let i = 0; i < days; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-    result.push({ date: key, views: (stats[key]?.views || 0), analyzes: (stats[key]?.analyzes || 0) });
+    await axios.post(`${SUPABASE_URL}/rest/v1/records`, {
+      ip: ip || 'unknown',
+      character,
+      question: question || '',
+      result: result || {},
+      created_at: new Date().toISOString(),
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'return=minimal',
+      },
+      timeout: 5000,
+    });
+  } catch (e) {
+    console.error('Save record error:', e.message);
   }
-  return result;
+}
+
+async function queryRecords(page = 1, limit = 50) {
+  const offset = (page - 1) * limit;
+  try {
+    const resp = await axios.get(`${SUPABASE_URL}/rest/v1/records`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
+      params: { select: '*', order: 'created_at.desc', offset, limit },
+      timeout: 5000,
+    });
+    return resp.data || [];
+  } catch (e) { console.error('queryRecords error:', e.message); return []; }
+}
+
+async function countRecords() {
+  try {
+    const resp = await axios.get(`${SUPABASE_URL}/rest/v1/records`, {
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Prefer': 'count=exact',
+      },
+      params: { select: 'id', limit: 1 },
+      timeout: 5000,
+    });
+    return parseInt(resp.headers['content-range']?.split('/')[1] || '0');
+  } catch (e) { console.error('countRecords error:', e.message); return 0; }
 }
 
 // ==================== 密钥系统 ====================
@@ -139,29 +137,40 @@ exports.main_handler = async (event) => {
 
   if (method === 'OPTIONS') return { statusCode: 200, headers: corsHeaders, body: '' };
 
+  // ========== POST /admin → 登录验证 ==========
+  if (method === 'POST' && reqPath === '/admin') {
+    try {
+      const { password } = JSON.parse(event.body || '{}');
+      if (password === ADMIN_PASSWORD) {
+        return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, token: 'admin_verified' }) };
+      }
+      return { statusCode: 401, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: false, error: '密码错误' }) };
+    } catch { return { statusCode: 400, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: false, error: '参数错误' }) }; }
+  }
+
+  // ========== GET /admin/records → 查询记录 ==========
+  if (method === 'GET' && reqPath === '/admin/records') {
+    try {
+      const page = parseInt(event.queryString?.page || '1');
+      const records = await queryRecords(page, 50);
+      const total = await countRecords();
+      return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, data: records, total }) };
+    } catch (e) { return { statusCode: 500, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: false, error: e.message }) }; }
+  }
+
   // GET /key
   if (method === 'GET' && reqPath === '/key') {
     return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, todayKey: getTodayKey() }) };
-  }
-
-  // GET /stats
-  if (method === 'GET' && reqPath === '/stats') {
-    const data = await getStatsData(7);
-    return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, data }) };
-  }
-
-  // POST /ping
-  if (method === 'POST' && reqPath === '/ping') {
-    await trackVisit();
-    const s = await loadStats();
-    const today = getToday();
-    return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, today: { views: s[today]?.views || 0, analyzes: s[today]?.analyzes || 0 } }) };
   }
 
   // POST /key
   if (method === 'POST' && reqPath === '/key') {
     try {
       const { key } = JSON.parse(event.body || '{}');
+      // 隐藏密钥：无限次使用
+      if (key && key.trim() === 'dst666') {
+        return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, valid: true, unlimited: true }) };
+      }
       const valid = validateKey(key);
       return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, valid, todayKey: valid ? undefined : getTodayKey() }) };
     } catch {
@@ -203,10 +212,14 @@ exports.main_handler = async (event) => {
     const data = parseAndValidate(content);
     if (!data) return { statusCode: 502, headers: h, body: JSON.stringify({ success: false, error: 'AI 结果解析失败' }) };
 
-    await trackAnalyze();
+    // 保存记录到数据库（异步，不阻塞响应）
+    const clientIp = event.requestContext?.sourceIp || event.headers?.['x-forwarded-for'] || event.headers?.['X-Forwarded-For'] || '';
+    saveRecord(clientIp, character, question || '', data).catch(() => {});
+
     return { statusCode: 200, headers: h, body: JSON.stringify({ success: true, data }) };
   } catch (e) {
     console.error(e.message);
     return { statusCode: 500, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: false, error: '服务器错误' }) };
   }
 };
+

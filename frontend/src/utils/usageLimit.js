@@ -29,13 +29,17 @@ function saveUsage(data) {
 export function getRemainingCount() {
   const usage = loadUsage();
   const today = getTodayId();
-  if (usage.date !== today) return FREE_LIMIT; // 新的一天
+  if (usage.date !== today) return FREE_LIMIT;
+  if (usage.unlimited) return Infinity;
   const limit = usage.key ? PREMIUM_LIMIT : FREE_LIMIT;
   return Math.max(0, limit - usage.count);
 }
 
 // 检查是否可以提问
 export function canAsk() {
+  const usage = loadUsage();
+  const today = getTodayId();
+  if (usage.date === today && usage.unlimited) return true;
   return getRemainingCount() > 0;
 }
 
@@ -62,14 +66,22 @@ export async function validateAndSetKey(key) {
       const today = getTodayId();
       usage.date = today;
       usage.key = key.trim().toUpperCase();
-      usage.count = 0; // 使用密钥后重置次数
+      usage.count = 0;
+      usage.unlimited = !!resp.unlimited;
       saveUsage(usage);
-      return { success: true };
+      return { success: true, unlimited: !!resp.unlimited };
     }
     return { success: false, message: '密钥无效或已过期' };
   } catch {
     return { success: false, message: '验证失败，请稍后重试' };
   }
+}
+
+// 是否无限次
+export function isUnlimited() {
+  const usage = loadUsage();
+  const today = getTodayId();
+  return usage.date === today && usage.unlimited === true;
 }
 
 // 是否已使用密钥
@@ -81,8 +93,10 @@ export function hasValidKey() {
 
 // 响应式剩余次数
 export const remainingCount = ref(getRemainingCount());
+export const unlimited = ref(isUnlimited());
 
 // 刷新剩余次数
 export function refreshCount() {
   remainingCount.value = getRemainingCount();
+  unlimited.value = isUnlimited();
 }
