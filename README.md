@@ -72,7 +72,10 @@
 
 | 首页 | 测字输入 | 结果分析 |
 |:---:|:---:|:---:|
-| <img src="screenshots/home.png" width="100%" alt="首页" /> | <img src="screenshots/input.png" width="100%" alt="测字输入" /> | <img src="screenshots/result.png" width="100%" alt="结果分析" /> |
+| <img src="screenshots/home.png" width="100%" alt="首页" /> | <img src="screenshots/input.png" width="100%" alt="测字输入" /> |
+
+| 结果分析 |
+| <img src="screenshots/result.png" width="100%" alt="结果分析" /> |
 
 | 历史记录 | 关于页面 |
 |:---:|:---:|
