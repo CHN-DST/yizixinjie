@@ -25,12 +25,12 @@ function setSeen() {
 
 onMounted(() => {
   if (!getSeen()) {
+    setSeen()  // 先写 localStorage，防止动画中途退出导致下次重复播放
     showSplash.value = true
   }
 })
 
 function handleSplashDone() {
-  setSeen()
   showSplash.value = false
 }
 </script>
