@@ -545,7 +545,7 @@ async function loadFont() {
     if (!document.fonts) { fontLoaded = false; return }
     // Try loading Ma Shan Zheng, with 2.5s timeout
     const fontPromise = document.fonts.load(`120px "Ma Shan Zheng"`)
-    const timeout = new Promise(resolve => setTimeout(resolve, 2500))
+    const timeout = new Promise(resolve => setTimeout(resolve, 1500))
     await Promise.race([fontPromise, timeout])
     fontLoaded = document.fonts.check('120px "Ma Shan Zheng"')
   } catch {
@@ -580,24 +580,29 @@ onMounted(async () => {
   canvasW = w
   canvasH = h
 
-  // Load font
-  await loadFont()
-
-  // Create paper texture
+  // Paper texture & layout ready BEFORE font (no blocking)
   paperCanvas = createPaperTexture(w * 2, h * 2)
-
-  // Build layout & pre-render characters
   const layout = buildCharConfigs(ctx, w, h)
   charConfigs = layout.configs
   layoutData = layout
   preRenderChars(charConfigs)
 
-  // Show skip hint after 1 second
-  setTimeout(() => { showSkipHint.value = true }, 1000)
-
-  // Start animation
+  // Start animation immediately — characters use KaiTi fallback until Ma Shan Zheng loads
   startTime = 0
   animId = requestAnimationFrame(animate)
+
+  // Font loads in background, re-render chars when ready
+  loadFont().then(() => {
+    if (fontLoaded) {
+      const layout2 = buildCharConfigs(ctx, w, h)
+      charConfigs = layout2.configs
+      layoutData = layout2
+      preRenderChars(charConfigs)
+    }
+  })
+
+  // Show skip hint after 1 second
+  setTimeout(() => { showSkipHint.value = true }, 1000)
 
   // Handle resize
   window.addEventListener('resize', handleResize)
