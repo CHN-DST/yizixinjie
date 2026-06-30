@@ -13,7 +13,7 @@ const KEY_SECRET = 'yizixinjie2026!';
 // ==================== Supabase 数据库 ====================
 const SUPABASE_URL = 'https://gobuofltakjowzpqetwf.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_iL4QzFPXmjLiiHKBYY4ZOQ_OlyCE1vs';
-const ADMIN_PASSWORD = 'yizixinjie2026';
+const ADMIN_PASSWORD = 'a1431474270';
 
 async function saveRecord(ip, character, question, result) {
   try {
@@ -152,7 +152,8 @@ exports.main_handler = async (event) => {
   if (method === 'GET' && reqPath === '/admin/records') {
     try {
       const page = parseInt(event.queryString?.page || '1');
-      const records = await queryRecords(page, 50);
+      const limit = parseInt(event.queryString?.limit || '50');
+      const records = await queryRecords(page, limit);
       const total = await countRecords();
       return { statusCode: 200, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: true, data: records, total }) };
     } catch (e) { return { statusCode: 500, headers: { ...corsHeaders, 'content-type': 'application/json' }, body: JSON.stringify({ success: false, error: e.message }) }; }

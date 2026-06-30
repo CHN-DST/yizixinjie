@@ -3,7 +3,7 @@
     <!-- 导航 -->
     <van-nav-bar
       left-text="←"
-      @click-left="$router.push('/camera')"
+      @click-left="$router.push('/')"
       fixed
       placeholder
     >
@@ -154,7 +154,7 @@
 
       <!-- 底部操作 -->
       <div class="result-actions anim-5">
-        <button class="btn-primary" style="width:100%" @click="$router.push('/camera')">
+        <button class="btn-primary" style="width:100%" @click="goRetry">
           再测一字
         </button>
       </div>
@@ -176,9 +176,11 @@
 
 <script setup>
 import { computed, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { useCharStore } from '@/stores/charStore';
 import SharePoster from '@/components/common/SharePoster.vue';
 
+const router = useRouter();
 const charStore = useCharStore();
 const posterRef = ref(null);
 
@@ -211,6 +213,12 @@ const giftText = computed(() => {
   return '一字见心';
 });
 
+function goRetry() {
+  charStore.setCharacter('');
+  charStore.setQuestion('');
+  router.push('/camera');
+}
+
 function shareResult() {
   if (posterRef.value) {
     posterRef.value.show(charStore.currentResult, charStore.currentQuestion);
@@ -220,7 +228,7 @@ function shareResult() {
 
 <style scoped>
 .result-page {
-  background: var(--color-ink-50);
+  /* transparent — app-container bg shows through */
   padding-bottom: var(--space-16);
 }
 
@@ -336,12 +344,13 @@ function shareResult() {
   flex-shrink: 0;
   width: 24px;
   height: 24px;
-  background: var(--color-ink-100);
-  color: var(--color-ink-600);
+  background: var(--color-gold-bg);
+  color: var(--color-accent-dark);
   font-size: var(--text-xs);
   font-weight: 600;
   display: flex;
   align-items: center;
+  border: 1px solid var(--color-gold-border);
   justify-content: center;
   border-radius: var(--radius-sm);
 }

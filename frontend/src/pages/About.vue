@@ -98,7 +98,7 @@
 
 <style scoped>
 .about-page {
-  background: var(--color-ink-50);
+  /* transparent — app-container bg shows through */
 }
 
 /* 头部 */

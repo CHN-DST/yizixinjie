@@ -85,7 +85,7 @@ function saveImage() {
   const cx = W / 2; // center X
 
   // 汉字
-  ctx.fillStyle = '#1a1714';
+  ctx.fillStyle = '#1f1810';
   ctx.font = 'bold 140px "KaiTi","STKaiti","SimKai",serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'top';
@@ -95,7 +95,7 @@ function saveImage() {
   // 问题
   if (question) {
     y += 24;
-    ctx.fillStyle = '#8a8278';
+    ctx.fillStyle = '#8C7259';
     ctx.font = '30px "Noto Serif SC","SimSun",serif';
     const qLines = wrapText(ctx, '"' + question + '"', W - PAD * 2);
     for (const line of qLines) {
@@ -107,7 +107,7 @@ function saveImage() {
   // 判词
   if (pattern) {
     y += 24;
-    ctx.fillStyle = '#3d5a4b';
+    ctx.fillStyle = '#9F452F';
     ctx.font = '38px "KaiTi","STKaiti","SimKai",serif';
     const pLines = wrapText(ctx, '「' + pattern + '」', W - PAD * 2);
     for (const line of pLines) {
@@ -122,7 +122,7 @@ function saveImage() {
     // 赠言背景
     const giftLines = wrapText(ctx, gift, W - PAD * 2 - 32);
     const giftH = giftLines.length * 52 + 40;
-    ctx.fillStyle = '#f7f5f1';
+    ctx.fillStyle = '#f4efe7';
     const bgX = PAD;
     const bgW = W - PAD * 2;
     ctx.beginPath();
@@ -137,7 +137,7 @@ function saveImage() {
     ctx.quadraticCurveTo(bgX, y - 20, bgX + 6, y - 20);
     ctx.fill();
 
-    ctx.fillStyle = '#2d2a24';
+    ctx.fillStyle = '#2e2419';
     ctx.font = '34px "KaiTi","STKaiti","SimKai",serif';
     for (const line of giftLines) {
       ctx.fillText(line, cx, y);
@@ -148,7 +148,7 @@ function saveImage() {
 
   // 分割线 + 品牌
   y += 32;
-  ctx.strokeStyle = '#e0dbd2';
+  ctx.strokeStyle = '#d4c5b4';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(PAD, y);
@@ -156,11 +156,11 @@ function saveImage() {
   ctx.stroke();
 
   y += 44;
-  ctx.fillStyle = '#6b6358';
+  ctx.fillStyle = '#5e4a33';
   ctx.font = '28px "Noto Serif SC","SimSun",serif';
   ctx.fillText('一字心解', cx, y);
   y += 36;
-  ctx.fillStyle = '#a8a094';
+  ctx.fillStyle = '#a48e74';
   ctx.font = '20px "PingFang SC","Microsoft YaHei",sans-serif';
   ctx.fillText('yizixinjie.pages.dev', cx, y);
 

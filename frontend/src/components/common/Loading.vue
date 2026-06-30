@@ -1,7 +1,7 @@
 <template>
   <div class="loading-overlay" v-if="visible">
     <div class="loading-content">
-      <van-loading type="spinner" size="48" color="#4a90d9" />
+      <van-loading type="spinner" size="48" color="#9F452F" />
       <p class="loading-text">{{ text }}</p>
     </div>
   </div>

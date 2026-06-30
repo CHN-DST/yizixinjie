@@ -1,4 +1,5 @@
 <template>
+  <SplashScreen v-if="showSplash" @done="handleSplashDone" />
   <div id="app" class="app-container">
     <router-view v-slot="{ Component }">
       <transition name="page" mode="out-in">
@@ -9,13 +10,35 @@
 </template>
 
 <script setup>
-// App 根组件 - 负责整体布局和路由视图
+import { ref, onMounted } from 'vue'
+import SplashScreen from './components/common/SplashScreen.vue'
+
+const SPLASH_KEY = 'yizixinjie_splash_seen'
+const showSplash = ref(false)
+
+function getSeen() {
+  try { return localStorage.getItem(SPLASH_KEY) } catch { return null }
+}
+function setSeen() {
+  try { localStorage.setItem(SPLASH_KEY, '1') } catch { /* noop */ }
+}
+
+onMounted(() => {
+  if (!getSeen()) {
+    showSplash.value = true
+  }
+})
+
+function handleSplashDone() {
+  setSeen()
+  showSplash.value = false
+}
 </script>
 
 <style scoped>
 .app-container {
   min-height: 100vh;
-  background-color: var(--color-ink-50);
+  /* transparent — body bg (color + texture) shows through */
 }
 
 .page-enter-active {

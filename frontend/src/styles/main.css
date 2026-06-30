@@ -15,6 +15,10 @@ body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--color-ink-900);
+  /* 多重背景：暖色半透明遮罩 + bg 图 → 图隐约透出，兼容所有平台 */
+  background:
+    linear-gradient(rgba(250, 247, 243, 0.84), rgba(250, 247, 243, 0.84)),
+    url('/bg1.png') center/cover no-repeat;
   background-color: var(--color-ink-50);
   line-height: 1.7;
   -webkit-font-smoothing: antialiased;
@@ -136,7 +140,7 @@ input, textarea {
 .btn-primary:hover {
   background: var(--color-ink-800);
   border-color: var(--color-gold-border);
-  box-shadow: var(--shadow-sm), 0 0 0 3px var(--color-gold-bg);
+  box-shadow: var(--color-gold-glow), var(--shadow-sm);
   transform: scale(1.02);
 }
 
@@ -168,8 +172,8 @@ input, textarea {
 }
 
 .btn-secondary:hover {
-  border-color: var(--color-accent);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--color-gold-border);
+  box-shadow: var(--color-gold-glow);
 }
 
 .btn-secondary:active {
@@ -190,7 +194,7 @@ input, textarea {
 
 .btn-text:hover {
   color: var(--color-accent-dark);
-  background: var(--color-accent-bg);
+  background: var(--color-gold-bg);
 }
 
 /* ============================================================
@@ -208,7 +212,7 @@ input, textarea {
 }
 
 .input-underline:focus {
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--color-gold);
 }
 
 .input-underline::placeholder {
@@ -267,7 +271,7 @@ input, textarea {
   width: 20px;
   height: 20px;
   border: 2px solid var(--color-ink-200);
-  border-top-color: var(--color-accent);
+  border-top-color: var(--color-gold);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -278,7 +282,7 @@ input, textarea {
 
 /* 导航栏 */
 .van-nav-bar {
-  background: rgba(250, 249, 247, 0.85) !important;
+  background: rgba(250, 247, 243, 0.85) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 0.5px solid var(--color-ink-150) !important;

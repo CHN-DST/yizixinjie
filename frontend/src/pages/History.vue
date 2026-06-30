@@ -78,7 +78,7 @@ async function handleClear() {
 
 <style scoped>
 .history-page {
-  background: var(--color-ink-50);
+  /* transparent — app-container bg shows through */
 }
 
 .history-count-text {

@@ -1,68 +1,78 @@
 /* ============================================================
-   一字心解 · Modern Eastern 设计系统
-   宣纸白 · 墨灰 · 鎏金 · 朱砂 · 青墨
-   克制 · 留白 · 呼吸感
+   一字心解 · 陶土暖调配色系统
+   暖褐 #8C7259 · 灰粉米 #CCBEB5 · 陶土红 #9F452F
+   大地色系 — 温润 · 质朴 · 呼吸感
    ============================================================ */
 
 :root {
   /* ============================================================
-     墨灰 — 文字主色
+     暖褐 — 文字主色（从 #8C7259 衍生）
      ============================================================ */
-  --color-ink-900: #1a1714;
-  --color-ink-800: #2d2a24;
-  --color-ink-700: #3d3a33;
-  --color-ink-600: #6b6358;
-  --color-ink-500: #8a8278;
-  --color-ink-400: #a8a094;
-  --color-ink-300: #c5bfb4;
-  --color-ink-200: #e0dbd2;
-  --color-ink-150: #ece8e0;
-  --color-ink-100: #f3f0eb;
-  --color-ink-75: #f7f5f1;
-  --color-ink-50: #faf9f7;
+  --color-ink-900: #1f1810;
+  --color-ink-800: #2e2419;
+  --color-ink-700: #423321;
+  --color-ink-600: #5e4a33;
+  --color-ink-500: #8C7259;
+  --color-ink-400: #a48e74;
+  --color-ink-300: #bfac97;
+  --color-ink-200: #d4c5b4;
+  --color-ink-150: #e2d6c8;
+  --color-ink-100: #eee6dc;
+  --color-ink-75: #f4efe7;
+  --color-ink-50: #faf7f3;
 
   /* ============================================================
-     鎏金 — 强调色（链接、标签、hover、聚焦装饰）
+     灰粉米 — 暖调中性色（从 #CCBEB5 衍生）
+     用于边框、卡片底色、微装饰
      ============================================================ */
-  --color-accent: #a0845c;
-  --color-accent-light: #b8996e;
-  --color-accent-dark: #7a6038;
-  --color-accent-bg: rgba(160, 132, 92, 0.08);
-  --color-accent-border: rgba(160, 132, 92, 0.2);
+  --color-warm: #CCBEB5;
+  --color-warm-light: #d9cec7;
+  --color-warm-dark: #a8988d;
+  --color-warm-bg: rgba(204, 190, 181, 0.14);
+
+  /* 鎏金等价 — 暖调代替原金色 */
+  --color-gold: #bfa590;
+  --color-gold-light: #d2bfac;
+  --color-gold-bg: rgba(191, 165, 144, 0.1);
+  --color-gold-border: rgba(191, 165, 144, 0.28);
+  --color-gold-glow: 0 0 0 4px rgba(191, 165, 144, 0.1);
 
   /* ============================================================
-     青墨绿 — 辅助色（成功状态、次要标识）
+     陶土红 — 强调 / CTA（从 #9F452F 衍生）
      ============================================================ */
-  --color-sage: #4a7c5c;
-  --color-sage-light: #6b9b7d;
-  --color-sage-bg: rgba(74, 124, 92, 0.06);
+  --color-accent: #9F452F;
+  --color-accent-light: #b8553d;
+  --color-accent-dark: #7a3322;
+  --color-accent-bg: rgba(159, 69, 47, 0.08);
+  --color-accent-border: rgba(159, 69, 47, 0.2);
+
+  --color-primary: #9F452F;
+  --color-primary-light: #b8553d;
+  --color-primary-dark: #7a3322;
+  --color-primary-bg: rgba(159, 69, 47, 0.06);
+  --color-primary-glow: 0 0 0 4px rgba(159, 69, 47, 0.1);
 
   /* ============================================================
-     暖金 — 装饰点缀
+     青灰绿 — 辅助色（保持克制）
      ============================================================ */
-  --color-warm: #c47a4a;
-  --color-warm-light: #d4956a;
-  --color-warm-dark: #a06030;
-  --color-warm-bg: rgba(196, 122, 74, 0.06);
-  --color-gold: #c9a86c;
-  --color-gold-light: #dbc08a;
-  --color-gold-bg: rgba(201, 168, 108, 0.08);
-  --color-gold-border: rgba(201, 168, 108, 0.25);
+  --color-sage: #6b8f7a;
+  --color-sage-light: #8aaa97;
+  --color-sage-bg: rgba(107, 143, 122, 0.06);
 
   /* ============================================================
-     朱砂 — 核心 CTA 与关键强调
+     暖琥珀 — 装饰点缀
      ============================================================ */
-  --color-primary: #b5342e;
-  --color-primary-light: #c9504a;
-  --color-primary-dark: #8a1f1a;
-  --color-primary-bg: rgba(181, 52, 46, 0.06);
+  --color-warm-accent: #b88060;
+  --color-warm-accent-light: #cc9a7c;
+  --color-warm-accent-dark: #8c5c3f;
+  --color-warm-accent-bg: rgba(184, 128, 96, 0.06);
 
   /* ============================================================
      功能色
      ============================================================ */
-  --color-success: #4a7c5c;
-  --color-warning: #c4812a;
-  --color-danger: #c0392b;
+  --color-success: #6b8f7a;
+  --color-warning: #b88060;
+  --color-danger: #9F452F;
 
   /* ============================================================
      兼容旧 token
@@ -70,7 +80,7 @@
   --bg-primary: var(--color-ink-50);
   --bg-secondary: rgba(255, 255, 255, 0.92);
   --bg-card: #ffffff;
-  --bg-card-hover: #faf9f7;
+  --bg-card-hover: #faf7f3;
   --bg-dark: var(--color-ink-900);
 
   --text-primary: var(--color-ink-900);
@@ -95,11 +105,11 @@
   /* ============================================================
      阴影
      ============================================================ */
-  --shadow-xs: 0 1px 2px rgba(26, 23, 20, 0.04);
-  --shadow-sm: 0 1px 3px rgba(26, 23, 20, 0.05), 0 1px 2px rgba(26, 23, 20, 0.03);
-  --shadow-md: 0 4px 12px rgba(26, 23, 20, 0.06), 0 1px 3px rgba(26, 23, 20, 0.04);
-  --shadow-lg: 0 8px 24px rgba(26, 23, 20, 0.08), 0 2px 6px rgba(26, 23, 20, 0.04);
-  --shadow-card-hover: 0 6px 20px rgba(26, 23, 20, 0.08), 0 1px 4px rgba(26, 23, 20, 0.04);
+  --shadow-xs: 0 1px 2px rgba(31, 24, 16, 0.04);
+  --shadow-sm: 0 1px 3px rgba(31, 24, 16, 0.05), 0 1px 2px rgba(31, 24, 16, 0.03);
+  --shadow-md: 0 4px 12px rgba(31, 24, 16, 0.06), 0 1px 3px rgba(31, 24, 16, 0.04);
+  --shadow-lg: 0 8px 24px rgba(31, 24, 16, 0.08), 0 2px 6px rgba(31, 24, 16, 0.04);
+  --shadow-card-hover: 0 6px 20px rgba(31, 24, 16, 0.08), 0 1px 4px rgba(31, 24, 16, 0.04);
 
   /* ============================================================
      字体

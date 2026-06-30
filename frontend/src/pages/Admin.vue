@@ -2,19 +2,28 @@
   <div class="page-container admin-page">
     <div class="content-container">
       <!-- 登录 -->
-      <div v-if="!loggedIn" class="login-box">
-        <h1>一字心解</h1>
+      <div v-if="!loggedIn" class="login-box card">
+        <p class="login-char">字</p>
+        <h1 class="login-title">一字心解</h1>
         <p class="login-sub">后台管理系统</p>
-        <input v-model="password" type="password" placeholder="请输入管理密码" @keyup.enter="login" />
-        <button class="login-btn" @click="login">登录后台</button>
-        <p v-if="loginError" class="error-msg">{{ loginError }}</p>
+        <input
+          v-model="password"
+          type="password"
+          class="login-input"
+          placeholder="请输入管理密码"
+          @keyup.enter="login"
+        />
+        <button class="btn-primary" style="width:100%;margin-top:16px;" @click="login">
+          登录后台
+        </button>
+        <p v-if="loginError" class="login-error">{{ loginError }}</p>
       </div>
 
       <!-- 数据面板 -->
       <div v-else>
         <div class="admin-header">
-          <h1>一字心解 · 后台管理</h1>
-          <button class="refresh-btn" @click="loadRecords">刷新</button>
+          <h1 class="admin-title">一字心解 · 后台管理</h1>
+          <button class="btn-secondary" @click="loadRecords" style="padding:6px 16px;font-size:13px;">刷新</button>
         </div>
 
         <div class="stats-row">
@@ -38,10 +47,10 @@
             <tbody>
               <tr v-if="loading"><td colspan="7" class="loading-cell">加载中...</td></tr>
               <tr v-for="r in records" :key="r.id">
-                <td>{{ r.id }}</td>
+                <td class="id-cell">{{ r.id }}</td>
                 <td class="time-cell">{{ formatTime(r.created_at) }}</td>
                 <td class="char-cell">{{ r.character }}</td>
-                <td class="q-cell">{{ r.question }}</td>
+                <td class="q-cell">{{ r.question || '-' }}</td>
                 <td>{{ r.result?.wuxing || '-' }}</td>
                 <td class="pattern-cell">{{ (r.result?.divination?.pattern || '-').substring(0, 50) }}</td>
                 <td class="ip-cell">{{ r.ip }}</td>
@@ -51,9 +60,9 @@
         </div>
 
         <div class="pager">
-          <button :disabled="page <= 1" @click="prevPage">上一页</button>
-          <span>第 {{ page }} 页</span>
-          <button @click="nextPage">下一页</button>
+          <button class="btn-secondary" :disabled="page <= 1" @click="prevPage" style="padding:6px 20px;font-size:13px;">上一页</button>
+          <span class="page-info">第 {{ page }} 页</span>
+          <button class="btn-secondary" @click="nextPage" style="padding:6px 20px;font-size:13px;">下一页</button>
         </div>
       </div>
     </div>
@@ -71,7 +80,8 @@ const total = ref(0);
 const page = ref(1);
 const loading = ref(false);
 
-const totalPages = computed(() => Math.max(1, Math.ceil(total.value / 50)));
+const PAGE_SIZE = 10;
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / PAGE_SIZE)));
 
 async function login() {
   try {
@@ -95,7 +105,7 @@ async function login() {
 async function loadRecords() {
   loading.value = true;
   try {
-    const resp = await fetch(`https://1439501934-k13421vmpj.ap-guangzhou.tencentscf.com/admin/records?page=${page.value}`);
+    const resp = await fetch(`https://1439501934-k13421vmpj.ap-guangzhou.tencentscf.com/admin/records?page=${page.value}&limit=${PAGE_SIZE}`);
     const data = await resp.json();
     if (data.success) {
       records.value = data.data;
@@ -121,34 +131,208 @@ function formatTime(t) {
 </script>
 
 <style scoped>
-.admin-page { background: #f5f0e8; min-height: 100vh; }
+/* ============================================================
+   页面背景 + 宽版容器
+   ============================================================ */
+.admin-page {
+  /* transparent — app-container bg shows through */
+  min-height: 100vh;
+}
 
-.login-box { max-width: 320px; margin: 100px auto; text-align: center; }
-.login-box h1 { font-family: KaiTi, STKaiti, serif; letter-spacing: 4px; color: #2c1810; font-size: 28px; }
-.login-sub { color: #8b7355; margin: 8px 0 24px; font-size: 14px; }
-.login-box input { width: 100%; padding: 12px; border: 1px solid #a89078; font-size: 16px; text-align: center; background: rgba(253,250,244,0.9); }
-.login-btn { width: 100%; padding: 12px; margin-top: 10px; background: #8b3a2a; color: #fff; border: none; font-size: 16px; cursor: pointer; font-family: KaiTi, serif; letter-spacing: 2px; }
-.error-msg { color: #c41e3a; margin-top: 12px; font-size: 14px; }
+.admin-page .content-container {
+  max-width: 1100px;
+}
 
-.admin-header { display: flex; justify-content: space-between; align-items: center; margin: 16px 0; }
-.admin-header h1 { font-family: KaiTi, serif; font-size: 22px; letter-spacing: 2px; }
-.refresh-btn { padding: 8px 20px; background: #8b3a2a; color: #fff; border: none; cursor: pointer; font-family: KaiTi, serif; letter-spacing: 2px; }
+/* ============================================================
+   登录框 — 与首页 Hero 风格一致
+   ============================================================ */
+.login-box {
+  max-width: 360px;
+  margin: 120px auto;
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+}
 
-.stats-row { display: flex; justify-content: space-between; font-size: 14px; color: #6b5040; margin-bottom: 12px; }
+.login-char {
+  font-family: var(--font-kai);
+  font-size: 56px;
+  color: var(--color-ink-900);
+  line-height: 1;
+  margin-bottom: var(--space-4);
+}
 
-.table-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; background: rgba(253,250,244,0.92); border: 1px solid #d0c0a8; font-size: 13px; }
-th { background: #2c1810; color: #fdf8f0; padding: 10px 8px; text-align: left; font-weight: 400; white-space: nowrap; }
-td { padding: 8px; border-bottom: 1px solid #d0c0a8; vertical-align: top; line-height: 1.5; }
-tr:hover { background: rgba(139,58,42,0.04); }
-.char-cell { font-family: KaiTi, serif; font-size: 20px; text-align: center; font-weight: 700; }
-.time-cell { white-space: nowrap; font-size: 12px; color: #6b5040; }
-.q-cell { max-width: 180px; word-break: break-all; }
-.pattern-cell { font-size: 12px; max-width: 200px; }
-.ip-cell { font-size: 11px; color: #999; white-space: nowrap; }
-.loading-cell { text-align: center; padding: 40px; color: #999; }
+.login-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--color-ink-900);
+  letter-spacing: 0.08em;
+}
 
-.pager { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 20px; }
-.pager button { padding: 8px 24px; background: #8b3a2a; color: #fff; border: none; cursor: pointer; font-family: KaiTi, serif; }
-.pager button:disabled { opacity: 0.4; cursor: default; }
+.login-sub {
+  font-size: var(--text-sm);
+  color: var(--color-ink-500);
+  margin: var(--space-2) 0 var(--space-8);
+  letter-spacing: 0.06em;
+}
+
+.login-input {
+  width: 100%;
+  padding: var(--space-3) 0;
+  font-size: var(--text-base);
+  color: var(--color-ink-900);
+  text-align: center;
+  border-bottom: 1.5px solid var(--color-ink-200);
+  background: transparent;
+  transition: border-color var(--transition-normal);
+  border-radius: 0;
+}
+
+.login-input:focus {
+  border-bottom-color: var(--color-gold);
+}
+
+.login-input::placeholder {
+  color: var(--color-ink-400);
+}
+
+.login-error {
+  color: var(--color-danger);
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+}
+
+/* ============================================================
+   顶部栏
+   ============================================================ */
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: var(--space-8) 0 var(--space-4);
+}
+
+.admin-title {
+  font-family: var(--font-serif);
+  font-size: var(--text-xl);
+  font-weight: 600;
+  color: var(--color-ink-900);
+  letter-spacing: 0.06em;
+}
+
+/* ============================================================
+   统计
+   ============================================================ */
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--text-sm);
+  color: var(--color-ink-500);
+  margin-bottom: var(--space-4);
+  letter-spacing: 0.03em;
+}
+
+/* ============================================================
+   表格
+   ============================================================ */
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-ink-150);
+  box-shadow: var(--shadow-xs);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  font-size: var(--text-sm);
+}
+
+th {
+  background: var(--color-ink-900);
+  color: var(--color-ink-50);
+  padding: 10px 10px;
+  text-align: left;
+  font-weight: 500;
+  font-size: var(--text-xs);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid var(--color-ink-150);
+  vertical-align: top;
+  line-height: 1.6;
+  color: var(--color-ink-700);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: var(--color-ink-75);
+}
+
+.char-cell {
+  font-family: var(--font-kai);
+  font-size: var(--text-lg);
+  text-align: center;
+  font-weight: 600;
+  color: var(--color-ink-900);
+}
+
+.time-cell {
+  white-space: nowrap;
+  font-size: var(--text-xs);
+  color: var(--color-ink-500);
+}
+
+.q-cell {
+  max-width: 240px;
+  word-break: break-all;
+}
+
+.pattern-cell {
+  font-size: var(--text-sm);
+  min-width: 280px;
+  line-height: 1.7;
+}
+
+.ip-cell {
+  font-size: var(--text-2xs);
+  color: var(--color-ink-400);
+  white-space: nowrap;
+  font-family: monospace;
+}
+
+.id-cell {
+  font-size: var(--text-2xs);
+  color: var(--color-ink-400);
+}
+
+.loading-cell {
+  text-align: center;
+  padding: var(--space-10) !important;
+  color: var(--color-ink-400);
+}
+
+/* ============================================================
+   分页
+   ============================================================ */
+.pager {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-bottom: var(--space-8);
+}
+
+.page-info {
+  font-size: var(--text-sm);
+  color: var(--color-ink-500);
+}
 </style>

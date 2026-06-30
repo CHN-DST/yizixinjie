@@ -3,7 +3,7 @@
     <!-- 顶部导航 -->
     <van-nav-bar
       left-text="←"
-      @click-left="$router.back()"
+      @click-left="$router.push('/')"
       fixed
       placeholder
     >
@@ -77,7 +77,7 @@
         <p style="font-size:14px;color:var(--color-ink-600);margin-bottom:12px;line-height:1.6;">
           每日免费 2 次，输入密钥后可提至 10 次/天
         </p>
-        <p style="font-size:13px;color:var(--color-warm-dark);margin-bottom:12px;text-align:center;background:#fdf8ee;padding:8px;border-radius:6px;">
+        <p style="font-size:13px;color:var(--color-warm-dark);margin-bottom:12px;text-align:center;background:#f2ece4;padding:8px;border-radius:6px;">
           添加微信 <b>kzeays</b> 获取密钥
         </p>
         <van-field v-model="keyInput" placeholder="输入密钥" maxlength="15" />
@@ -108,9 +108,9 @@ const keyError = ref('');
 // 加载文案轮播
 const loadingTexts = [
   '正在翻阅《说文解字》…',
-  '正在解析字源…',
-  '正在整理思绪…',
-  '正在生成答案…',
+  '正在推演字理…',
+  '正在观象取格…',
+  '正在参悟玄机…',
 ];
 const loadingText = ref(loadingTexts[0]);
 let loadingTimer = null;
@@ -199,7 +199,7 @@ async function handleKeySubmit() {
 
 <style scoped>
 .camera-page {
-  background: var(--color-ink-50);
+  /* transparent — app-container bg shows through */
 }
 
 /* 剩余次数 */
@@ -241,7 +241,7 @@ async function handleKeySubmit() {
 }
 
 .char-input-underline:focus {
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--color-gold);
 }
 
 .char-input-underline::placeholder {

@@ -165,7 +165,7 @@ function goDailyChar() {
 }
 
 .home-char-input:focus {
-  border-bottom-color: var(--color-accent);
+  border-bottom-color: var(--color-gold);
 }
 
 .home-char-input::placeholder {
@@ -250,9 +250,9 @@ function goDailyChar() {
 }
 
 .daily-card:hover {
-  box-shadow: var(--shadow-card-hover);
+  box-shadow: var(--color-gold-glow), var(--shadow-card-hover);
   transform: translateY(-1px);
-  border-color: var(--color-gold-border);
+  border-color: var(--color-gold);
 }
 
 .daily-char {
