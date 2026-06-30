@@ -46,6 +46,7 @@ const INK_LIGHT = 'rgba(26,26,26,0.12)'
 const ACCENT_COLOR = '#916F47'
 
 // Timeline (ms)
+const T_WRITE_START = 800
 const T_FADE_IN = 800
 const T_WRITE_MAIN = 2200
 const T_WRITE_SUB = 3000
