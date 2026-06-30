@@ -37,8 +37,8 @@ let frameCount = 0
 let fontLoaded = false
 
 // ── Constants ──
-const MAIN_TEXT = '一字心解'
-const SUB_TEXT = '一字见心'
+const MAIN_TEXT = '言为心声，字为心画。'
+const SUB_TEXT = '心形运笔，笔画藏休咎。'
 const FONT_FAMILY = '"Ma Shan Zheng", "KaiTi", "STKaiti", "楷体", serif'
 const PAPER_COLOR = '#F7F2E4'
 const INK_COLOR = '#1A1A1A'
@@ -48,10 +48,10 @@ const ACCENT_COLOR = '#916F47'
 // Timeline (ms)
 const T_WRITE_START = 800
 const T_FADE_IN = 800
-const T_WRITE_MAIN = 2200
-const T_WRITE_SUB = 3000
-const T_FINALE = 3500
-const T_EXIT = 3800
+const T_WRITE_MAIN = 2700
+const T_WRITE_SUB = 4200
+const T_FINALE = 4500
+const T_EXIT = 4800
 
 // ── Noise helpers ──
 function hash(x, y) {
@@ -204,67 +204,50 @@ function drawParticles(ctx2d) {
 
 // ── Character layout ──
 function buildCharConfigs(ctx2d, w, h) {
-  const mainFontSize = Math.min(w * 0.17, h * 0.1, 96)
-  const subFontSize = mainFontSize * 0.52
+  const maxWidth = w * 0.9
+  const mainFontSize = Math.min(w * 0.088, h * 0.065, 48)
+  const subFontSize = mainFontSize * 0.88
   const configs = []
 
-  // Measure & position main text
-  ctx2d.font = `${mainFontSize}px ${FONT_FAMILY}`
-  const mainChars = MAIN_TEXT.split('')
-  const mainWidths = mainChars.map(c => ctx2d.measureText(c).width)
-  const mainTotalW = mainWidths.reduce((a, b) => a + b, 0) + (mainChars.length - 1) * mainFontSize * 0.08
-  const mainStartX = (w - mainTotalW) / 2
-  const mainY = h * 0.36
+  // Helper: position characters in a single row, centered
+  function layoutRow(text, fontSize, y, startTime, perCharTime) {
+    ctx2d.font = `${fontSize}px ${FONT_FAMILY}`
+    const chars = text.split('')
+    const widths = chars.map(c => ctx2d.measureText(c).width)
+    const totalW = widths.reduce((a, b) => a + b, 0) + (chars.length - 1) * fontSize * 0.06
+    const startX = (w - totalW) / 2
 
-  let cx = mainStartX
-  mainChars.forEach((char, i) => {
-    const cw = mainWidths[i]
-    configs.push({
-      char,
-      x: cx + cw / 2,
-      y: mainY,
-      width: cw,
-      height: mainFontSize * 1.15,
-      fontSize: mainFontSize,
-      direction: char === '一' ? 'lr' : 'tb',
-      start: T_WRITE_START + i * 380,
-      end: T_WRITE_START + (i + 1) * 380 - 40,
+    let cx = startX
+    chars.forEach((char, i) => {
+      const cw = widths[i]
+      configs.push({
+        char,
+        x: cx + cw / 2,
+        y,
+        width: cw,
+        height: fontSize * 1.15,
+        fontSize,
+        direction: 'tb',
+        start: startTime + i * perCharTime,
+        end: startTime + (i + 1) * perCharTime - 20,
+      })
+      cx += cw + fontSize * 0.06
     })
-    cx += cw + mainFontSize * 0.08
-  })
+    return totalW
+  }
 
-  // Separator dot position (after main text, at same level)
-  const dotX = cx + mainFontSize * 0.2
-  const dotY = mainY
+  const line1Y = h * 0.35
+  const line2Y = h * 0.55
 
-  // Measure & position sub text (below and right of main)
-  ctx2d.font = `${subFontSize}px ${FONT_FAMILY}`
-  const subChars = SUB_TEXT.split('')
-  const subWidths = subChars.map(c => ctx2d.measureText(c).width)
-  const subTotalW = subWidths.reduce((a, b) => a + b, 0) + (subChars.length - 1) * subFontSize * 0.06
+  // Line 1: 言为心声，字为心画。
+  const line1Chars = MAIN_TEXT.length
+  layoutRow(MAIN_TEXT, mainFontSize, line1Y, T_WRITE_START, 170)
 
-  // Sub text starts near the dot position
-  const subStartX = Math.min(dotX + mainFontSize * 0.3, w - subTotalW - 40)
-  const subY = mainY + mainFontSize * 1.3
+  // Line 2: 心形运笔，笔画藏休咎。
+  const line2Start = T_WRITE_START + line1Chars * 170 + 60  // slight gap between lines
+  layoutRow(SUB_TEXT, subFontSize, line2Y, line2Start, 150)
 
-  let sx = subStartX
-  subChars.forEach((char, i) => {
-    const cw = subWidths[i]
-    configs.push({
-      char,
-      x: sx + cw / 2,
-      y: subY,
-      width: cw,
-      height: subFontSize * 1.15,
-      fontSize: subFontSize,
-      direction: char === '一' ? 'lr' : 'tb',
-      start: 2280 + i * 180,
-      end: 2280 + (i + 1) * 180 - 20,
-    })
-    sx += cw + subFontSize * 0.06
-  })
-
-  return { configs, mainY, mainFontSize, dotX, dotY, subY, subFontSize }
+  return { configs, mainY: line1Y, mainFontSize, dotX: 0, dotY: 0, subY: line2Y, subFontSize }
 }
 
 // ── Pre-render characters to offscreen canvases ──
@@ -470,26 +453,7 @@ function animate(timestamp) {
     }
   }
 
-  // 5. Ink dot separator — appear after main text done
-  const MAIN_DONE = T_WRITE_START + 3 * 380 + 380 - 40  // ~2260ms, when "解" finishes
-  const dotElapsed = elapsed - MAIN_DONE
-  if (dotElapsed > 0 && dotElapsed < 500 && layoutData) {
-    const dotProgress = clamp(dotElapsed / 400, 0, 1)
-    const ds = easeOutCubic(dotProgress)
-    const { dotX, dotY, mainFontSize } = layoutData
-    const dotR = Math.max(mainFontSize * 0.07, 5) * ds
-    ctx.fillStyle = INK_COLOR
-    ctx.beginPath()
-    ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2)
-    ctx.fill()
-    // Ink bleed around dot
-    ctx.fillStyle = 'rgba(26,26,26,0.08)'
-    ctx.beginPath()
-    ctx.arc(dotX, dotY, dotR * 3, 0, Math.PI * 2)
-    ctx.fill()
-  }
-
-  // 6. Finale ink spread effects
+  // 5. Finale ink spread effects
   if (elapsed > T_FINALE) {
     if (frameCount % 3 === 0) {
       const cx = canvasW * 0.5 + (Math.random() - 0.5) * canvasW * 0.4
@@ -508,7 +472,7 @@ function animate(timestamp) {
   // 9. Brush cursor
   if (brushPos && anyWriting) {
     const brushAlpha = clamp((elapsed - T_WRITE_START) / 300, 0, 1) *
-      (1 - clamp((elapsed - T_WRITE_SUB) / 400, 0, 1))
+      (1 - clamp((elapsed - T_WRITE_SUB + 200) / 400, 0, 1))
     // Offset brush to appear behind the tip
     const bx = brushPos.x + (brushAngle === 0 ? -30 : 0)
     const by = brushPos.y - 10
