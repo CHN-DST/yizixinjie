@@ -10,57 +10,62 @@ const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
 const KEY_SECRET = 'yizixinjie2026!';
 
-// ==================== Supabase 数据库 ====================
-const SUPABASE_URL = 'https://gobuofltakjowzpqetwf.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_iL4QzFPXmjLiiHKBYY4ZOQ_OlyCE1vs';
+// ==================== Cloudflare D1 数据库 ====================
+const CF_ACCOUNT_ID = 'f8573594431f8f4d77e16d0f37c20722';
+const CF_D1_ID = '1ab19a8d-0fb9-418a-93c8-9fe07449289f';
+const CF_API_TOKEN = process.env.CF_API_TOKEN || '';
 const ADMIN_PASSWORD = 'a1431474270';
+
+function d1Query(sql, params = []) {
+  return axios.post(
+    `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/d1/database/${CF_D1_ID}/query`,
+    { sql, params },
+    {
+      headers: {
+        'Authorization': `Bearer ${CF_API_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      timeout: 10000,
+    }
+  );
+}
 
 async function saveRecord(ip, character, question, result) {
   try {
-    await axios.post(`${SUPABASE_URL}/rest/v1/records`, {
-      ip: ip || 'unknown',
-      character,
-      question: question || '',
-      result: result || {},
-      created_at: new Date().toISOString(),
-    }, {
-      headers: {
-        'Content-Type': 'application/json',
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer': 'return=minimal',
-      },
-      timeout: 5000,
-    });
+    const resp = await d1Query(
+      'INSERT INTO records (ip, character, question, result, created_at) VALUES (?, ?, ?, ?, ?)',
+      [ip || 'unknown', character, question || '', JSON.stringify(result || {}), new Date().toISOString()]
+    );
+    if (!resp.data.success) console.error('D1 insert failed:', resp.data.errors);
   } catch (e) {
     console.error('Save record error:', e.message);
   }
 }
 
-async function queryRecords(page = 1, limit = 50) {
-  const offset = (page - 1) * limit;
+async function queryRecords(page = 1, limit = 10) {
   try {
-    const resp = await axios.get(`${SUPABASE_URL}/rest/v1/records`, {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` },
-      params: { select: '*', order: 'created_at.desc', offset, limit },
-      timeout: 5000,
-    });
-    return resp.data || [];
+    const offset = (page - 1) * limit;
+    const resp = await d1Query(
+      'SELECT * FROM records ORDER BY id DESC LIMIT ? OFFSET ?',
+      [limit, offset]
+    );
+    if (resp.data.success && resp.data.result[0]) {
+      return resp.data.result[0].results.map(r => ({
+        ...r,
+        result: typeof r.result === 'string' ? JSON.parse(r.result) : r.result,
+      }));
+    }
+    return [];
   } catch (e) { console.error('queryRecords error:', e.message); return []; }
 }
 
 async function countRecords() {
   try {
-    const resp = await axios.get(`${SUPABASE_URL}/rest/v1/records`, {
-      headers: {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Prefer': 'count=exact',
-      },
-      params: { select: 'id', limit: 1 },
-      timeout: 5000,
-    });
-    return parseInt(resp.headers['content-range']?.split('/')[1] || '0');
+    const resp = await d1Query('SELECT COUNT(*) AS total FROM records');
+    if (resp.data.success && resp.data.result[0]) {
+      return resp.data.result[0].results[0]?.total || 0;
+    }
+    return 0;
   } catch (e) { console.error('countRecords error:', e.message); return 0; }
 }
 
