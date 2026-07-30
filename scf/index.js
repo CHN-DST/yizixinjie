@@ -10,6 +10,27 @@ const DEEPSEEK_URL = 'https://api.deepseek.com/v1/chat/completions';
 const PUBLIC_DIR = path.resolve(__dirname, 'public');
 const KEY_SECRET = 'yizixinjie2026!';
 
+// ==================== 速率限制 ====================
+const RATE_LIMIT = new Map(); // IP → { count, resetAt }
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  const entry = RATE_LIMIT.get(ip);
+  if (entry && now < entry.resetAt) {
+    entry.count++;
+    if (entry.count > 5) return false; // max 5 req/min per IP
+  } else {
+    RATE_LIMIT.set(ip, { count: 1, resetAt: now + 60000 });
+  }
+  // 清理过期条目
+  if (RATE_LIMIT.size > 1000) {
+    for (const [k, v] of RATE_LIMIT) {
+      if (now > v.resetAt) RATE_LIMIT.delete(k);
+    }
+  }
+  return true;
+}
+
 // ==================== Cloudflare D1 数据库 ====================
 const CF_ACCOUNT_ID = 'f8573594431f8f4d77e16d0f37c20722';
 const CF_D1_ID = '1ab19a8d-0fb9-418a-93c8-9fe07449289f';
@@ -217,10 +238,17 @@ exports.main_handler = async (event) => {
 
   // POST /analyze
   try {
+    const clientIp = event.requestContext?.sourceIp || event.headers?.['x-forwarded-for'] || event.headers?.['X-Forwarded-For'] || '';
+    const h = { ...corsHeaders, 'content-type': 'application/json' };
+
+    // 速率限制：每 IP 每分钟最多 5 次
+    if (!checkRateLimit(clientIp)) {
+      return { statusCode: 429, headers: h, body: JSON.stringify({ success: false, error: '请求太频繁，请稍后再试' }) };
+    }
+
     const body = JSON.parse(event.body || '{}');
     const { character, question } = body;
     const apiKey = process.env.DEEPSEEK_API_KEY;
-    const h = { ...corsHeaders, 'content-type': 'application/json' };
 
     if (!apiKey) return { statusCode: 500, headers: h, body: JSON.stringify({ success: false, error: 'API Key 未配置' }) };
     if (!character || !/^[一-鿿]$/.test(character)) return { statusCode: 400, headers: h, body: JSON.stringify({ success: false, error: '请输入一个有效汉字' }) };
@@ -232,7 +260,7 @@ exports.main_handler = async (event) => {
         { role: 'system', content: buildPrompt(character, question || '') },
         { role: 'user', content: question ? `请以测字大师身份分析"${character}"，为我指点迷津。` : `请为我一解"${character}"字的玄机。` },
       ],
-      max_tokens: 4096, temperature: 0.7,
+      max_tokens: 2048, temperature: 0.7,
     }, { headers: { 'content-type': 'application/json', Authorization: `Bearer ${apiKey}` }, timeout: 90000 });
 
     const content = resp.data?.choices?.[0]?.message?.content;
@@ -241,7 +269,6 @@ exports.main_handler = async (event) => {
     if (!data) return { statusCode: 502, headers: h, body: JSON.stringify({ success: false, error: 'AI 结果解析失败' }) };
 
     // 保存记录到数据库（异步，不阻塞响应）
-    const clientIp = event.requestContext?.sourceIp || event.headers?.['x-forwarded-for'] || event.headers?.['X-Forwarded-For'] || '';
     saveRecord(clientIp, character, question || '', data).catch(() => {});
 
     return { statusCode: 200, headers: h, body: JSON.stringify({ success: true, data }) };
